@@ -1,0 +1,3 @@
+interface:
+  display_name: "Recent Codex Closures"
+  short_description: "Find Codex sessions that just closed"
