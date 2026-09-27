@@ -26,8 +26,9 @@ Never place credentials, workbooks, or project-specific data in this skill folde
 4. Run `wood-project implementation plan <workbook.xlsx> --json` before proposing any
    OpenProject change. Planning is read-only. Review the result for planned creations,
    updates, reused records, ambiguity, and failures.
-5. Present the plan in terms of versions/releases, epics, stories, hierarchy, and
+5. Present the plan in terms of R# Planning Increments (OpenProject Versions), Epics, Stories, hierarchy, and
    predecessor relations. Obtain explicit approval for the specific apply operation.
+   Confirm Domain or Platform ownership and each Story's Primary Repository before publication.
 6. Only after approval, run `wood-project implementation apply <workbook.xlsx> --json`.
    Record its output in the run directory. Verify its reported IDs and the workbook
    write-back before claiming success.

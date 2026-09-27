@@ -61,10 +61,20 @@ instead of copying a token or resolved file into the repository.
 
 ## Workbook behavior
 
-The workbook represents the desired state for a root work package, versions/releases,
+The workbook represents the desired state for a root work package, R# Planning Increments,
 epics, stories, and predecessor relations. Planning and apply resolve the OpenProject
 project and root work package from workbook metadata. Repeated runs reuse existing
 records where their ID or an unambiguous deterministic match identifies them.
+
+The `Version` column is retained for OpenProject compatibility. New values use
+`R1`, `R2`, ... `R10`, optionally with a descriptive suffix such as
+`R1 — Codex Foundations`; they are never parsed as SemVer. Story rows also carry
+`Primary Repository`, optional `Affected Repositories`, and `Released In`.
+Leave `Released In` empty when planning or publishing; fill it with the actual
+repository semantic-release version only after the Story ships. The owning
+OpenProject project follows the outcome: Domain for a product or repository,
+Platform for shared CI/CD, infrastructure, secrets, authentication, migrations,
+or cross-repository engineering. Do not create a generic Ad Hoc project.
 
 On successful apply, the CLI verifies writes before reporting them and writes confirmed
 Story OpenProject IDs and root metadata back into the workbook. These write-backs are

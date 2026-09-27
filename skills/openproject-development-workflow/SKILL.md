@@ -10,7 +10,10 @@ Apply this workflow from the repository that owns the Story. It assumes the repo
 credential is read from `~/.wood/runtime/openproject.env`.
 
 1. Run `wood-next-story --json` to select the next dependency-ready Story. Read its
-   goal, acceptance criteria, dependencies, and target release before editing.
+   goal, acceptance criteria, predecessors, and Planning Increment before editing.
+   The command selects a ready Story from the earliest active R# Planning Increment,
+   ordered numerically (R9 before R10). OpenProject Version is that increment, not
+   a repository artifact version.
 2. With explicit approval to start that Story, preview then apply its status update:
    `wood-set-story-status <id> --status "In progress" --json`, followed by the same
    command with `--apply`. When requesting execution approval, use the reusable command
@@ -39,23 +42,27 @@ credential is read from `~/.wood/runtime/openproject.env`.
    approval, use the reusable command prefix `wood-set-story-status`, not a
    Story-ID-specific prefix.
 
-## Release-loop authorization
+## Planning Increment loop authorization
 
-When the user explicitly asks to continue a named release loop, that authorization covers
+When the user explicitly asks to continue a named Planning Increment loop, that authorization covers
 selection, status changes, branching, implementation, and validation for each next
-dependency-ready Story in that release. Stop at the review gate for every Story. Approval
+dependency-ready Story in that Planning Increment. Stop at the review gate for every Story. Approval
 of a review authorizes delivery and closure of only that reviewed Story; after it is
-complete, resume the loop with the next Story automatically. Do not treat release-loop
+complete, resume the loop with the next Story automatically. Do not treat loop
 authorization as approval to commit, push, open or merge a PR, or close a Story before its
 individual review approval.
 
-An active release loop must not end an agent turn after partial implementation, an initial
+An active Planning Increment loop must not end an agent turn after partial implementation, an initial
 test pass, or a progress update. Continue until the Story reaches its review gate, a
 genuine blocker requires user direction, or no dependency-ready Story remains. After a
 review-approved Story is delivered, continue directly to the next Story rather than
 returning a terminal response between loop iterations.
 
 ## Guards
+
+- Leave `Released In` blank during planning and implementation. After the actual
+  repository semantic-release version is known, record it on the shipped Story;
+  a Planning Increment may contain multiple such versions and GitHub Releases.
 
 - `wood-next-story` is read-only. `wood-set-story-status --apply` mutates OpenProject.
 - Delete Story branches only after confirming their PR merged and after switching away
