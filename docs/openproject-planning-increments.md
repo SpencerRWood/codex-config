@@ -9,8 +9,9 @@ engineering. A code edit in a Domain repository does not by itself move a shared
 outcome out of Platform. Resolve ownership before publishing Stories. Do not use
 a generic Ad Hoc project or create a project for each migration.
 
-Use `Project → R# Planning Increment → Epic → Story → pull request → repository
-artifact`. An OpenProject Version represents exactly one Planning Increment.
+Use `Project → R# Planning Increment → Epic → Story`, with pull requests and
+repository releases providing separate delivery traceability. An OpenProject
+Version represents exactly one Planning Increment.
 Name it `R1`, `R2`, etc., optionally adding a description such as `R1 — Codex
 Foundations`. Order by the numeric R value, so R10 follows R9. The R identifier
 has no relationship to repository SemVer. A Planning Increment may include
@@ -24,23 +25,30 @@ Story's actual repository semantic-release version is known, enter that version
 without changing its Planning Increment. A GitHub Release is the published
 repository artifact record, separate from both fields.
 
-The next-Story selector scans active R# Planning Increments in numeric order
-and selects a Story whose predecessors are closed. A Planning Increment is
+The Wood Tools V2 next-Story selector will scan active R# Planning Increments
+in numeric order and select a Story whose predecessors are closed. A Planning Increment is
 complete when all included Stories are closed and shipped Stories have release
 traceability where practical. Completion does not require a single repository
 version or GitHub Release for the whole increment.
 
-## Existing OpenProject data: migration notes
+## Current runtime boundary
 
-Do not rename historical Versions or rewrite repository release history
-automatically. Inventory each existing OpenProject project, Version, Story,
-predecessor relation, repository, and known artifact version first. Decide the
-durable Domain or Platform owner from the outcome; group migrations within
-Platform increments and Epics. Map future planned work to new R# Versions.
-For active legacy Versions, draft an explicit Story-by-Story mapping and review
-whether renaming or moving would change historical meaning or external links.
-Preserve old names when necessary and document the mapping rather than inferring
-SemVer from a Version name. Populate `Released In` only from verified repository
-release evidence. Preview all intended OpenProject writes and run the separate
-live migration only after its own approval. This task makes no live changes to
-existing OpenProject projects or Versions.
+The clean OpenProject cutover retired the legacy backlog as `Rejected`, closed
+legacy Versions, and left no active Story or Planning Increment. Historical work,
+Version assignments, and predecessor relations remain intact. Wood Tools is frozen
+until V2; do not retrofit its selector or importer now. The current importer still
+uses its 18-column workbook contract and does not consume `Primary Repository`,
+`Affected Repositories`, or `Released In`. It defaults to the `Implementation`
+sheet, but it does not enforce R# Versions or the traceability lifecycle. Its
+selector still uses legacy Version ordering and fallback behavior. The 21-column
+Google Drive Planning Increment templates are the V2 target contract, not a
+supported current import contract. Do not publish a new backlog with the frozen
+importer solely because a template contains the target headers.
+
+The installed `~/.wood/scripts/wood_openproject_env.py` is a temporary local
+compatibility patch for the current `OpenProjectSettings` constructor. It is a
+regular local file. The current codex-config installer leaves it alone; another
+install that replaces `~/.wood/scripts` may overwrite it. Reproduce the
+fix by removing unsupported `initiative_id` and `ca_file` constructor arguments
+and supplying `project_id` as a string. Keep this patch local until V2 defines
+the durable helper installation or generation path.

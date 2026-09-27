@@ -9,11 +9,12 @@ Apply this workflow from the repository that owns the Story. It assumes the repo
 `.env` provides the repository's OpenProject URL and initiative ID. The shared
 credential is read from `~/.wood/runtime/openproject.env`.
 
-1. Run `wood-next-story --json` to select the next dependency-ready Story. Read its
-   goal, acceptance criteria, predecessors, and Planning Increment before editing.
-   The command selects a ready Story from the earliest active R# Planning Increment,
-   ordered numerically (R9 before R10). OpenProject Version is that increment, not
-   a repository artifact version.
+1. Run `wood-next-story --json` to inspect the current backlog. After the clean
+   cutover it should report no available Story. The installed Wood Tools selector
+   still has legacy Version behavior; its R# ordering and strict active-increment
+   selection are deferred to Wood Tools V2. Do not start new R# Story work through
+   that selector until V2 implements the canonical contract. For any existing
+   selected Story, read its goal, acceptance criteria, and predecessors before editing.
 2. With explicit approval to start that Story, preview then apply its status update:
    `wood-set-story-status <id> --status "In progress" --json`, followed by the same
    command with `--apply`. When requesting execution approval, use the reusable command
@@ -44,6 +45,10 @@ credential is read from `~/.wood/runtime/openproject.env`.
 
 ## Planning Increment loop authorization
 
+This loop applies only after Wood Tools V2 implements canonical R# selection.
+The current empty backlog and frozen selector do not support starting a new
+Planning Increment loop through `wood-next-story`.
+
 When the user explicitly asks to continue a named Planning Increment loop, that authorization covers
 selection, status changes, branching, implementation, and validation for each next
 dependency-ready Story in that Planning Increment. Stop at the review gate for every Story. Approval
@@ -60,6 +65,8 @@ returning a terminal response between loop iterations.
 
 ## Guards
 
+- Wood Tools is frozen until V2. The Planning Increment model here is the target
+  workflow, not a claim that the current selector enforces it.
 - Leave `Released In` blank during planning and implementation. After the actual
   repository semantic-release version is known, record it on the shipped Story;
   a Planning Increment may contain multiple such versions and GitHub Releases.

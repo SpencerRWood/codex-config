@@ -23,12 +23,15 @@ Never place credentials, workbooks, or project-specific data in this skill folde
    `~/.wood/state/openproject-implementation/runs/<timestamp-or-run-id>/`. Preserve the
    exported snapshot and the JSON result of every plan there. This directory is local
    operational state, not source-controlled project content.
-4. Run `wood-project implementation plan <workbook.xlsx> --json` before proposing any
-   OpenProject change. Planning is read-only. Review the result for planned creations,
-   updates, reused records, ambiguity, and failures.
-5. Present the plan in terms of R# Planning Increments (OpenProject Versions), Epics, Stories, hierarchy, and
-   predecessor relations. Obtain explicit approval for the specific apply operation.
-   Confirm Domain or Platform ownership and each Story's Primary Repository before publication.
+4. Check the workbook contract before invoking the importer. The current Wood Tools importer
+   requires 18 columns and ignores the three traceability columns in the new Google
+   Drive templates. Treat the 21-column Planning Increment templates as the Wood
+   Tools V2 target; do not plan or publish them through the frozen importer.
+5. For a workbook supported by the current importer, run
+   `wood-project implementation plan <workbook.xlsx> --json` before proposing any
+   OpenProject change. Planning is read-only. Review planned creations, updates,
+   reused records, ambiguity, and failures. Present the plan's Versions, Epics,
+   Stories, hierarchy, and predecessors, then obtain approval for the specific apply.
 6. Only after approval, run `wood-project implementation apply <workbook.xlsx> --json`.
    Record its output in the run directory. Verify its reported IDs and the workbook
    write-back before claiming success.
@@ -49,6 +52,9 @@ package has actually been created or selected.
 
 ## Boundaries
 
+- Do not change the frozen Wood Tools importer or use its current 18-column behavior
+  as evidence that `Primary Repository`, `Affected Repositories`, or `Released In`
+  will be persisted. Those fields and strict R# enforcement are V2 work.
 - `implementation apply` is the sole operation here that may mutate OpenProject.
   Never run it merely because a user asked to inspect, prepare, export, or plan.
 - Stop on ambiguous matches, stale IDs, missing credentials, or an unresolved project
@@ -65,10 +71,10 @@ package has actually been created or selected.
 - Shared Wood runtime and secrets: `~/.wood/`
 - Local plans and apply records: `~/.wood/state/openproject-implementation/runs/`
 
-For a read-only next-Story lookup that uses the calling repository's resolved
-OpenProject environment instead of the global registry, use `wood-next-story --json`.
-It reads `.env.resolved` in the current repository (or `.env` only if no resolved file
-exists) and uses `OPENPROJECT_INITIATIVE_ID` by default.
+For a read-only next-Story lookup, use `wood-next-story --json`. The installed
+wrapper reads `.env` in the current directory by default; use `--env-file` for
+another path. It uses `OPENPROJECT_INITIATIVE_ID` by default and remains subject
+to the frozen selector behavior described above.
 
 For workbook sheets, required environment, and exact CLI behavior, read
 [workbook operations](references/workbook-operations.md).

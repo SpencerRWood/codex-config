@@ -59,22 +59,25 @@ Add `.env` and `.env.resolved` to the repository's `.gitignore`. If a repository
 one explicit environment file outside its root, pass its absolute path with `--env-file`
 instead of copying a token or resolved file into the repository.
 
-## Workbook behavior
+## Current workbook behavior and V2 target
 
-The workbook represents the desired state for a root work package, R# Planning Increments,
-epics, stories, and predecessor relations. Planning and apply resolve the OpenProject
-project and root work package from workbook metadata. Repeated runs reuse existing
-records where their ID or an unambiguous deterministic match identifies them.
+The frozen Wood Tools importer defaults to the `Implementation` sheet and requires
+18 columns ending in `Notes`. It treats `Version` as an OpenProject Version name,
+without enforcing R# Planning Increment syntax. It does not consume the newer
+`Primary Repository`, `Affected Repositories`, or `Released In` columns if they
+appear in a workbook. Planning and apply resolve the OpenProject project and root
+work package from workbook metadata. Repeated runs reuse existing records where
+their ID or an unambiguous deterministic match identifies them.
 
-The `Version` column is retained for OpenProject compatibility. New values use
-`R1`, `R2`, ... `R10`, optionally with a descriptive suffix such as
-`R1 — Codex Foundations`; they are never parsed as SemVer. Story rows also carry
-`Primary Repository`, optional `Affected Repositories`, and `Released In`.
-Leave `Released In` empty when planning or publishing; fill it with the actual
-repository semantic-release version only after the Story ships. The owning
-OpenProject project follows the outcome: Domain for a product or repository,
-Platform for shared CI/CD, infrastructure, secrets, authentication, migrations,
-or cross-repository engineering. Do not create a generic Ad Hoc project.
+The Google Drive templates define the Wood Tools V2 target: `Version` holds an
+R# Planning Increment such as `R1 — Codex Foundations`, ordered by its numeric R
+identifier and independent of repository SemVer. Story rows require `Primary
+Repository`; `Affected Repositories` may be blank; `Released In` stays blank
+during planning and records an actual repository semantic-release version only
+after shipment. The owning project follows the Domain/Platform outcome rule.
+Do not apply a new 21-column template with the frozen importer or claim those
+traceability fields will be persisted. The template/importer mismatch is
+intentional technical debt for Wood Tools V2.
 
 On successful apply, the CLI verifies writes before reporting them and writes confirmed
 Story OpenProject IDs and root metadata back into the workbook. These write-backs are
