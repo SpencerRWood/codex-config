@@ -10,6 +10,8 @@ at `~/.local/bin/wood-project`.
 wood-project implementation export <initiative-id> --output-dir <run-dir> --json
 wood-project implementation plan <workbook.xlsx> --json
 wood-project implementation apply <workbook.xlsx> --json
+wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --json
+wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --apply --json
 ```
 
 Use `export` to obtain a current workbook and JSON snapshot for an existing initiative.
@@ -59,12 +61,22 @@ Add `.env` and `.env.resolved` to the repository's `.gitignore`. If a repository
 one explicit environment file outside its root, pass its absolute path with `--env-file`
 instead of copying a token or resolved file into the repository.
 
-## Workbook behavior
+## Workbook contract
 
-The workbook represents the desired state for a root work package, versions/releases,
-epics, stories, and predecessor relations. Planning and apply resolve the OpenProject
-project and root work package from workbook metadata. Repeated runs reuse existing
-records where their ID or an unambiguous deterministic match identifies them.
+The `Implementation` sheet has 21 columns. `Version` is an R# planning release,
+such as `R1 — Codex Foundations`, ordered by its numeric R identifier. Story
+traceability includes `Project`, `Version`, `Primary Repository`, `Affected
+Repositories`, `Predecessors`, and `Released In`. The importer reads all 21
+columns and accepts older 18-column workbooks with empty traceability fields.
+Repository fields are persisted in Story descriptions and recovered on export.
+Planning and apply require `Released In` to be blank. They never infer a repository
+artifact version from the R# planning release. The owning project follows the
+Domain/Platform outcome rule.
+
+After the repository artifact is shipped and the Story is closed, use
+`record-release` with the actual semantic version. Its default mode previews the
+update; `--apply` updates the OpenProject Story and workbook. Reapplying the same
+version makes no changes. A conflicting existing value is rejected.
 
 On successful apply, the CLI verifies writes before reporting them and writes confirmed
 Story OpenProject IDs and root metadata back into the workbook. These write-backs are
