@@ -11,4 +11,6 @@ The preview is read-only. `--project` and `--initiative` select a target when me
 
 The `Implementation` sheet models the project, R# planning version, Epic, Story, repository traceability, and predecessors. `Released In` stays blank during planning; R# is not an artifact version. The command reuses unambiguous matches, verifies writes, and records confirmed OpenProject IDs and root metadata in the workbook. Preserve those write-backs for idempotent reruns.
 
+When the import creates a project, read back its canonical identifier and record it as `OPENPROJECT_PROJECT_ID` in the owning repository's uncommitted `.env`. Set `OPENPROJECT_INITIATIVE_ID` only after its root work package exists. Preserve other `.env` values and keep the token in Infisical.
+
 Keep credentials in Infisical. Save only JSON plans and apply results in the local run directory. Stop on ambiguous matches, stale IDs, or missing credentials. The `wood` v2 CLI has no workbook export or manual release-recording command; use the supported import and Story evidence workflow.
