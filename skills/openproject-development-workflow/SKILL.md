@@ -9,12 +9,9 @@ Apply this workflow from the repository that owns the Story. It assumes the repo
 `.env` provides the repository's OpenProject URL and initiative ID. The shared
 credential is read from `~/.wood/runtime/openproject.env`.
 
-1. Run `wood-next-story --json` to inspect the current backlog. After the clean
-   cutover it should report no available Story. The installed Wood Tools selector
-   still has legacy Version behavior; its R# ordering and strict active-increment
-   selection are deferred to Wood Tools V2. Do not start new R# Story work through
-   that selector until V2 implements the canonical contract. For any existing
-   selected Story, read its goal, acceptance criteria, and predecessors before editing.
+1. Run `wood-next-story --json` to inspect the current backlog. It selects a
+   dependency-ready Story from the earliest active R# planning release. Read its
+   goal, acceptance criteria, and predecessors before editing.
 2. With explicit approval to start that Story, preview then apply its status update:
    `wood-set-story-status <id> --status "In progress" --json`, followed by the same
    command with `--apply`. When requesting execution approval, use the reusable command
@@ -37,17 +34,19 @@ credential is read from `~/.wood/runtime/openproject.env`.
    merged local Story branch with `git branch -d <branch>`, and delete its remote branch
    with `git push origin --delete <branch>`. When the PR used squash or rebase merging,
    `git branch -d` may reject the equivalent local commit; force-delete only that exact
-   local branch after verifying its merged PR or patch equivalence. Story closure is
-   separate: after the PR is merged and the user approves closure, preview then run
-   `wood-set-story-status <id> --status "Closed" --apply`. When requesting execution
-   approval, use the reusable command prefix `wood-set-story-status`, not a
+   local branch after verifying its merged PR or patch equivalence. The post-review
+   approval also authorizes closure of that Story after the PR is confirmed merged and
+   all applicable required checks have passed, including post-merge validation when
+   configured. Read the live OpenProject status, preview the transition, then run
+   `wood-set-story-status <id> --status "Closed" --apply` and verify the result. Do not
+   close while a required check is pending, failed, or unavailable. When requesting
+   execution approval, use the reusable command prefix `wood-set-story-status`, not a
    Story-ID-specific prefix.
 
 ## Planning Increment loop authorization
 
-This loop applies only after Wood Tools V2 implements canonical R# selection.
-The current empty backlog and frozen selector do not support starting a new
-Planning Increment loop through `wood-next-story`.
+The selector uses active R# planning releases in numeric order and respects
+predecessor readiness. Start the loop when an active backlog has eligible work.
 
 When the user explicitly asks to continue a named Planning Increment loop, that authorization covers
 selection, status changes, branching, implementation, and validation for each next
@@ -65,10 +64,10 @@ returning a terminal response between loop iterations.
 
 ## Guards
 
-- Wood Tools is frozen until V2. The Planning Increment model here is the target
-  workflow, not a claim that the current selector enforces it.
+- The selector uses active R# planning releases in numeric order.
 - Leave `Released In` blank during planning and implementation. After the actual
-  repository semantic-release version is known, record it on the shipped Story;
+  repository semantic-release version is known, record it with
+  `wood-project implementation record-release <workbook> <story-id> <version> --apply`;
   a Planning Increment may contain multiple such versions and GitHub Releases.
 
 - `wood-next-story` is read-only. `wood-set-story-status --apply` mutates OpenProject.
@@ -79,4 +78,5 @@ returning a terminal response between loop iterations.
   uncommitted work outside the requested scope, or the OpenProject environment is not
   resolved.
 - Do not create a branch, commit, push, PR, or close a Story as an implicit consequence
-  of selecting it. Each occurs only at the approval point above.
+  of selecting it. Closure follows only the individual post-review approval and the
+  verified merge and checks described above.

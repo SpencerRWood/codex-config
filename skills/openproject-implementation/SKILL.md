@@ -23,11 +23,9 @@ Never place credentials, workbooks, or project-specific data in this skill folde
    `~/.wood/state/openproject-implementation/runs/<timestamp-or-run-id>/`. Preserve the
    exported snapshot and the JSON result of every plan there. This directory is local
    operational state, not source-controlled project content.
-4. Check the workbook contract before invoking the importer. The current Wood Tools importer
-   requires 18 columns and ignores the three traceability columns in the new Google
-   Drive templates. Treat the 21-column Planning Increment templates as the Wood
-   Tools V2 target; do not plan or publish them through the frozen importer.
-5. For a workbook supported by the current importer, run
+4. Check that Version values are R# planning releases and Released In is blank.
+   The 21-column template is supported; older 18-column workbooks remain readable.
+5. Run
    `wood-project implementation plan <workbook.xlsx> --json` before proposing any
    OpenProject change. Planning is read-only. Review planned creations, updates,
    reused records, ambiguity, and failures. Present the plan's Versions, Epics,
@@ -52,11 +50,8 @@ package has actually been created or selected.
 
 ## Boundaries
 
-- Do not change the frozen Wood Tools importer or use its current 18-column behavior
-  as evidence that `Primary Repository`, `Affected Repositories`, or `Released In`
-  will be persisted. Those fields and strict R# enforcement are V2 work.
-- `implementation apply` is the sole operation here that may mutate OpenProject.
-  Never run it merely because a user asked to inspect, prepare, export, or plan.
+- `implementation apply` and post-shipment `implementation record-release --apply`
+  may mutate OpenProject. Never run either for inspect, export, or plan requests.
 - Stop on ambiguous matches, stale IDs, missing credentials, or an unresolved project
   context; do not create replacements or guess mappings.
 - Preserve the workbook as the desired state. Do not manually call OpenProject APIs or
@@ -73,8 +68,8 @@ package has actually been created or selected.
 
 For a read-only next-Story lookup, use `wood-next-story --json`. The installed
 wrapper reads `.env` in the current directory by default; use `--env-file` for
-another path. It uses `OPENPROJECT_INITIATIVE_ID` by default and remains subject
-to the frozen selector behavior described above.
+another path. It uses `OPENPROJECT_INITIATIVE_ID` by default and selects
+dependency-ready Stories in the earliest active R# planning release.
 
 For workbook sheets, required environment, and exact CLI behavior, read
 [workbook operations](references/workbook-operations.md).

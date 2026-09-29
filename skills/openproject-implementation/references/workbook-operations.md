@@ -10,6 +10,8 @@ at `~/.local/bin/wood-project`.
 wood-project implementation export <initiative-id> --output-dir <run-dir> --json
 wood-project implementation plan <workbook.xlsx> --json
 wood-project implementation apply <workbook.xlsx> --json
+wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --json
+wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --apply --json
 ```
 
 Use `export` to obtain a current workbook and JSON snapshot for an existing initiative.
@@ -59,25 +61,22 @@ Add `.env` and `.env.resolved` to the repository's `.gitignore`. If a repository
 one explicit environment file outside its root, pass its absolute path with `--env-file`
 instead of copying a token or resolved file into the repository.
 
-## Current workbook behavior and V2 target
+## Workbook contract
 
-The frozen Wood Tools importer defaults to the `Implementation` sheet and requires
-18 columns ending in `Notes`. It treats `Version` as an OpenProject Version name,
-without enforcing R# Planning Increment syntax. It does not consume the newer
-`Primary Repository`, `Affected Repositories`, or `Released In` columns if they
-appear in a workbook. Planning and apply resolve the OpenProject project and root
-work package from workbook metadata. Repeated runs reuse existing records where
-their ID or an unambiguous deterministic match identifies them.
+The `Implementation` sheet has 21 columns. `Version` is an R# planning release,
+such as `R1 — Codex Foundations`, ordered by its numeric R identifier. Story
+traceability includes `Project`, `Version`, `Primary Repository`, `Affected
+Repositories`, `Predecessors`, and `Released In`. The importer reads all 21
+columns and accepts older 18-column workbooks with empty traceability fields.
+Repository fields are persisted in Story descriptions and recovered on export.
+Planning and apply require `Released In` to be blank. They never infer a repository
+artifact version from the R# planning release. The owning project follows the
+Domain/Platform outcome rule.
 
-The Google Drive templates define the Wood Tools V2 target: `Version` holds an
-R# Planning Increment such as `R1 — Codex Foundations`, ordered by its numeric R
-identifier and independent of repository SemVer. Story rows require `Primary
-Repository`; `Affected Repositories` may be blank; `Released In` stays blank
-during planning and records an actual repository semantic-release version only
-after shipment. The owning project follows the Domain/Platform outcome rule.
-Do not apply a new 21-column template with the frozen importer or claim those
-traceability fields will be persisted. The template/importer mismatch is
-intentional technical debt for Wood Tools V2.
+After the repository artifact is shipped and the Story is closed, use
+`record-release` with the actual semantic version. Its default mode previews the
+update; `--apply` updates the OpenProject Story and workbook. Reapplying the same
+version makes no changes. A conflicting existing value is rejected.
 
 On successful apply, the CLI verifies writes before reporting them and writes confirmed
 Story OpenProject IDs and root metadata back into the workbook. These write-backs are
