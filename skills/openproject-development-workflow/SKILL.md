@@ -62,12 +62,16 @@ After the merge and required checks pass, post one concise OpenProject activity 
 to the Story before setting it to `Closed`. Include what shipped, the PR and merge commit,
 validation evidence, the published release tag when applicable, and any remaining
 limitations. Link to the authoritative GitHub run instead of pasting logs; exclude
-secret values. Use a stable heading such as `Implementation update (WP-<id>)` and check
-existing Story activities for that heading before posting, so retries do not duplicate
-the comment. Use the first-party Story command when it supports comments; otherwise
-OpenProject API v3 accepts `POST /api/v3/work_packages/<id>/activities` with
-`{"comment":{"raw":"..."}}`. Verify the created activity by readback. If the comment
-cannot be posted and verified, leave the Story open and report the failure.
+secret values. Use a stable first-line heading `Implementation update (WP-<id>)`.
+Write the exact comment to a UTF-8 file. With a released Wood Tools CLI that exposes
+`story activity add`, preview `wood story activity add <id> --file <path> --json`, then
+apply it with `--apply` and verify the returned activity ID. Its retry behavior reuses
+an identical update and blocks conflicting content across activity pages. Keep Story
+closure as a separate `wood story complete` step with all existing validation gates.
+If the released CLI does not yet expose this command, use OpenProject API v3
+`POST /api/v3/work_packages/<id>/activities` with `{"comment":{"raw":"..."}}`
+after checking existing activities, then verify the created activity by readback.
+If the comment cannot be posted and verified, leave the Story open and report the failure.
 
 ## Planning Increment loop authorization
 

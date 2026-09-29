@@ -28,7 +28,8 @@ returned status and branch. It does not commit or push.
 
 After a merged PR and required checks, prepare a JSON evidence file with passed
 `repository_checks` entries and a passed `ci` run URL. Post and verify the implementation
-update activity, then preview and apply `wood story complete <id> --evidence <file>
+update activity with the released `wood story activity add <id> --file <comment-file> --json`
+command (preview, then `--apply`), then preview and apply `wood story complete <id> --evidence <file>
 --json`. Verify the live closed status. Do not complete while checks are pending,
 failed, or unavailable.
 
