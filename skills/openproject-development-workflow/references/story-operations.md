@@ -1,8 +1,8 @@
 # Story operations
 
-Run these commands from the Story's repository. Set `OPENPROJECT_URL` from verified
-repository configuration and use Infisical in `dev` at `/openproject` to inject
-`OPENPROJECT_API_TOKEN`. Set `OPENPROJECT_PROJECT_ID` when available. The Story
+Run these commands from the Story's repository. Use Infisical in `dev` at
+`/openproject` to inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`.
+Discover the project and initiative IDs through `wood project list --json`. The Story
 commands use the single public `wood` executable.
 
 In the Wood Tools checkout under review, use `uv run --active --frozen wood`.
@@ -11,10 +11,8 @@ this command group. Keep the command's working directory in the Story repository
 `story start` checks its repository name and working tree.
 
 ```sh
-OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
 infisical run --env=dev --path=/openproject -- wood story next 208 --json
 
-OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
 infisical run --env=dev --path=/openproject -- wood story get <id> --json
 ```
 
