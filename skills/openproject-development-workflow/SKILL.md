@@ -12,6 +12,11 @@ Resolve the project and initiative IDs from repository context or
 [Story operations](references/story-operations.md). Before use, verify the selected
 `wood` executable exposes `story`. In a Wood Tools checkout under review, use
 `uv run --active --frozen wood` so commands invoke the checked-out implementation.
+Run every Infisical-backed OpenProject command with network permission from its first
+attempt (`sandbox_permissions="require_escalated"` for `exec_command`), including
+lookups, previews, applies, and readbacks. Carry that execution setting across the
+workflow; approval of one exact command does not give later commands network access.
+Network permission does not replace the Story mutation and review approvals below.
 
 1. Run `wood story next <initiative-ref> --json`, then `wood story get <id> --json`.
    Read the goal, acceptance criteria, dependencies, and target release before editing.
@@ -19,12 +24,16 @@ Resolve the project and initiative IDs from repository context or
    `wood story start <id> --json`. Verify the returned In progress status and local
    `feature/op-<id>-<slug>` branch when the Story names a repository. Do not push it
    merely to make a GitHub branch visible.
-3. Implement only the selected Story and its acceptance criteria. Preserve unrelated
-   worktree changes.
-4. Run the repository's declared checks. Use its documented commands and
-   `.pre-commit-config.yaml`; typical configured checks include Ruff, mypy, SQLFluff,
-   tests, and `pre-commit run --all-files`. Do not claim a check ran when its tool or
-   dependencies are unavailable.
+3. If the selected `wood` executable exposes `repo`, run `wood repo info --json` and
+   `wood repo standards --json` once to read the release contract and required
+   conventions. Implement only the selected Story and its acceptance criteria.
+   Preserve unrelated worktree changes.
+4. When available, run `wood repo validate --json` once after the edits. It selects
+   declared checks and returns bounded results with full log paths; inspect only logs
+   for failed checks. Use the repository's documented commands and
+   `.pre-commit-config.yaml` when `repo validate` is unavailable, reports an
+   unsupported check, or a failure needs focused diagnosis. Do not rerun passing
+   checks without a relevant change, or claim an unavailable check passed.
 5. **STOP FOR REVIEW.** Present the diff summary, changed files, validation results,
    and remaining risks. Do not commit, push, open a PR, merge, or close the Story until
    the user explicitly approves that post-review batch.
@@ -41,6 +50,10 @@ Resolve the project and initiative IDs from repository context or
    live OpenProject status, preview `wood story complete <id> --evidence <file>`, then
    apply it and verify the configured closed status. Do not close while a required
    check is pending, failed, or unavailable.
+
+After pushing and after deployment when applicable, use the bounded CI and deployment
+inspections in [Story operations](references/story-operations.md). Confirm that the
+evidence belongs to the Story's commit before using it for closure.
 
 ## Implementation update at closure
 

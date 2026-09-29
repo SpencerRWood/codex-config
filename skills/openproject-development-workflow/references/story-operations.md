@@ -32,3 +32,14 @@ After a merged PR and required checks, prepare a JSON evidence file with passed
 update activity, then preview and apply `wood story complete <id> --evidence <file>
 --json`. Verify the live closed status. Do not complete while checks are pending,
 failed, or unavailable.
+
+For a repository with the WP-400 commands, use the passed entries from
+`wood repo validate --json` as local `repository_checks` evidence and keep its returned
+log paths rather than pasting logs. `wood ci status --json` supplies the run URL only
+when its commit is current and the run succeeded. Use `wood ci failures --json` only
+to diagnose a failed current run. When `ci status` is stale because another commit has
+the latest repository run, use the PR's authoritative checks. `wood deploy status --json`
+supplies deployment evidence when `repo info` marks deployment applicable; specify
+`--environment` when several environments exist. `not_applicable` is expected for
+libraries without a deployment workflow. These read-only inspections do not authorize
+a Story status change or replace the live CI verification in `wood story complete`.
