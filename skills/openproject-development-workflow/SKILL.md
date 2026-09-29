@@ -5,10 +5,9 @@ description: "Execute an OpenProject Story through the shared development workfl
 
 # OpenProject development workflow
 
-Apply this workflow from the repository that owns the Story. Set `OPENPROJECT_URL`
-from repository configuration and use Infisical to inject `OPENPROJECT_API_TOKEN`.
-Resolve the project and initiative IDs from repository context or
-`wood project list --json`. Use the public `wood story` commands as described in
+Apply this workflow from the repository that owns the Story. Use Infisical to inject
+`OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`. Resolve the project and initiative
+IDs from repository context or `wood project list --json`. Use the public `wood story` commands as described in
 [Story operations](references/story-operations.md). Before use, verify the selected
 `wood` executable exposes `story`. In a Wood Tools checkout under review, use
 `uv run --active --frozen wood` so commands invoke the checked-out implementation.

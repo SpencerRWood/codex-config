@@ -8,7 +8,7 @@ description: "Plan or apply an Excel implementation workbook to OpenProject as v
 Use the public `wood project import-workbook` command from the repository that owns the workbook. Read [workbook operations](references/workbook-operations.md) for selectors, environment, and write-back behavior.
 
 1. Establish the workbook, owning repository, project, and initiative. Stop if the target is ambiguous.
-2. Set `OPENPROJECT_URL` from verified configuration and inject `OPENPROJECT_API_TOKEN` with Infisical. Save each JSON plan in a unique local run directory under `~/.wood/state/openproject-implementation/runs/`.
+2. Inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN` with Infisical. Discover the project and initiative IDs through `wood project list --json`. Save each JSON plan in a unique local run directory under `~/.wood/state/openproject-implementation/runs/`.
 3. Preview `wood project import-workbook <workbook.xlsx> --json`. Review the plan hash, every page of operations, hierarchy, and predecessor changes.
 4. After approval for that plan, run the same selectors with `--apply --plan-hash <reviewed-hash> --json`. Verify reported IDs and workbook write-back.
 

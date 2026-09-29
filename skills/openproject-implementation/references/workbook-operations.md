@@ -1,9 +1,8 @@
 # Workbook operations
 
-Run from the workbook's owning repository. Use the installed `wood` executable after checking that it exposes `project import-workbook`; in a Wood Tools checkout under review, use its checked-out implementation. Set `OPENPROJECT_URL` from verified configuration and inject `OPENPROJECT_API_TOKEN` with Infisical. Set `OPENPROJECT_PROJECT_ID` when available. For example:
+Run from the workbook's owning repository. Use the installed `wood` executable after checking that it exposes `project import-workbook`; in a Wood Tools checkout under review, use its checked-out implementation. Inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN` with Infisical. Discover project and initiative IDs through `wood project list --json`. For example:
 
 ```sh
-OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
 infisical run --env=dev --path=/openproject -- wood project import-workbook <workbook.xlsx> --json
 ```
 
@@ -11,6 +10,6 @@ The preview is read-only. `--project` and `--initiative` select a target when me
 
 The `Implementation` sheet models the project, R# planning version, Epic, Story, repository traceability, and predecessors. `Released In` stays blank during planning; R# is not an artifact version. The command reuses unambiguous matches, verifies writes, and records confirmed OpenProject IDs and root metadata in the workbook. Preserve those write-backs for idempotent reruns.
 
-When the import creates a project, read back its canonical identifier and record it as `OPENPROJECT_PROJECT_ID` in the owning repository's uncommitted `.env`. Set `OPENPROJECT_INITIATIVE_ID` only after its root work package exists. Preserve other `.env` values and keep the token in Infisical.
+When the import creates a project or initiative, discover its canonical ID from the verified apply result and a fresh `wood project list --json` readback. Pass selectors explicitly when the workbook metadata is ambiguous.
 
 Keep credentials in Infisical. Save only JSON plans and apply results in the local run directory. Stop on ambiguous matches, stale IDs, or missing credentials. The `wood` v2 CLI has no workbook export or manual release-recording command; use the supported import and Story evidence workflow.

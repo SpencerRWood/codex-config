@@ -8,7 +8,7 @@ Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skill
 
 ## Wood Tools v2 workflow
 
-The public execution contract is `wood`. Check `wood contract --json` for available commands. Set `OPENPROJECT_URL` from the repository, inject `OPENPROJECT_API_TOKEN` through Infisical, then use the [Story workflow](skills/openproject-development-workflow/SKILL.md) for its review and closure gates. The operational loop is:
+The public execution contract is `wood`. Check `wood contract --json` for available commands. Inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN` through Infisical, discover project and initiative IDs with `wood project list --json`, then use the [Story workflow](skills/openproject-development-workflow/SKILL.md) for its review and closure gates. The operational loop is:
 
 ```text
 wood doctor --json                         # readiness when uncertain
