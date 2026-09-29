@@ -25,30 +25,17 @@ Story's actual repository semantic-release version is known, enter that version
 without changing its Planning Increment. A GitHub Release is the published
 repository artifact record, separate from both fields.
 
-The Wood Tools V2 next-Story selector will scan active R# Planning Increments
-in numeric order and select a Story whose predecessors are closed. A Planning Increment is
+`wood story next <initiative-ref> --json` scans active R# Planning Increments
+in numeric order and selects a Story whose predecessors are closed. A Planning Increment is
 complete when all included Stories are closed and shipped Stories have release
 traceability where practical. Completion does not require a single repository
 version or GitHub Release for the whole increment.
 
-## Current runtime boundary
+## Current command path
 
-The clean OpenProject cutover retired the legacy backlog as `Rejected`, closed
-legacy Versions, and left no active Story or Planning Increment. Historical work,
-Version assignments, and predecessor relations remain intact. Wood Tools is frozen
-until V2; do not retrofit its selector or importer now. The current importer still
-uses its 18-column workbook contract and does not consume `Primary Repository`,
-`Affected Repositories`, or `Released In`. It defaults to the `Implementation`
-sheet, but it does not enforce R# Versions or the traceability lifecycle. Its
-selector still uses legacy Version ordering and fallback behavior. The 21-column
-Google Drive Planning Increment templates are the V2 target contract, not a
-supported current import contract. Do not publish a new backlog with the frozen
-importer solely because a template contains the target headers.
-
-The installed `~/.wood/scripts/wood_openproject_env.py` is a temporary local
-compatibility patch for the current `OpenProjectSettings` constructor. It is a
-regular local file. The current codex-config installer leaves it alone; another
-install that replaces `~/.wood/scripts` may overwrite it. Reproduce the
-fix by removing unsupported `initiative_id` and `ca_file` constructor arguments
-and supplying `project_id` as a string. Keep this patch local until V2 defines
-the durable helper installation or generation path.
+Use `wood project import-workbook` to preview and apply the 21-column workbook,
+`wood story next` to select eligible work, and `wood story get` to read its packet.
+The [development workflow](../skills/openproject-development-workflow/SKILL.md)
+governs Story status, branch preparation, review, and closure. Inject OpenProject
+credentials with Infisical. Python semantic-release owns artifact versions, tags,
+and GitHub Releases; the planning increment remains independent of those releases.

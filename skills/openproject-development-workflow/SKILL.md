@@ -18,12 +18,14 @@ lookups, previews, applies, and readbacks. Carry that execution setting across t
 workflow; approval of one exact command does not give later commands network access.
 Network permission does not replace the Story mutation and review approvals below.
 
-1. Run `wood story next <initiative-ref> --json`, then `wood story get <id> --json`.
+1. Use `wood doctor --json` when environment readiness is uncertain. Run
+   `wood story next <initiative-ref> --json`, then `wood story get <id> --json`.
    Read the goal, acceptance criteria, dependencies, and target release before editing.
 2. With explicit approval to start that Story, preview then apply
    `wood story start <id> --json`. Verify the returned In progress status and local
-   `feature/op-<id>-<slug>` branch when the Story names a repository. Do not push it
-   merely to make a GitHub branch visible.
+   `feature/op-<id>-<slug>` branch when the Story names a repository. Use an isolated
+   clean worktree when another Story has unfinished local changes. Do not push the
+   branch merely to make it visible on GitHub.
 3. If the selected `wood` executable exposes `repo`, run `wood repo info --json` and
    `wood repo standards --json` once to read the release contract and required
    conventions. Implement only the selected Story and its acceptance criteria.

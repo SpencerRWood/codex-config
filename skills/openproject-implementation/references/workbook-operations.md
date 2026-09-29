@@ -1,104 +1,14 @@
-# OpenProject implementation workbook operations
+# Workbook operations
 
-## Command surface
+Run from the workbook's owning repository. Use the installed `wood` executable after checking that it exposes `project import-workbook`; in a Wood Tools checkout under review, use its checked-out implementation. Set `OPENPROJECT_URL` from verified configuration and inject `OPENPROJECT_API_TOKEN` with Infisical. Set `OPENPROJECT_PROJECT_ID` when available. For example:
 
-Run the commands from the repository that owns the workbook, using its resolved Wood
-configuration. `wood-project` is installed centrally and is available on this machine
-at `~/.local/bin/wood-project`.
-
-```bash
-wood-project implementation export <initiative-id> --output-dir <run-dir> --json
-wood-project implementation plan <workbook.xlsx> --json
-wood-project implementation apply <workbook.xlsx> --json
-wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --json
-wood-project implementation record-release <workbook.xlsx> <story-work-package-id> <actual-semver> --apply --json
+```sh
+OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
+infisical run --env=dev --path=/openproject -- wood project import-workbook <workbook.xlsx> --json
 ```
 
-Use `export` to obtain a current workbook and JSON snapshot for an existing initiative.
-It reads OpenProject without changing it. Use `plan` to evaluate a workbook without
-changing OpenProject. Use `apply` only after explicit user approval.
+The preview is read-only. `--project` and `--initiative` select a target when metadata is ambiguous; repeat them for apply. `--operation-offset` pages through plans longer than 50 operations. Save and inspect all pages before approval. Apply the reviewed plan with `--apply --plan-hash <reviewed-hash> --json`. A changed workbook or OpenProject context invalidates the hash and requires a new review.
 
-## Per-repository environment
+The `Implementation` sheet models the project, R# planning version, Epic, Story, repository traceability, and predecessors. `Released In` stays blank during planning; R# is not an artifact version. The command reuses unambiguous matches, verifies writes, and records confirmed OpenProject IDs and root metadata in the workbook. Preserve those write-backs for idempotent reruns.
 
-The workbook commands read `--env-file`, which defaults to `.env.resolved` in the
-current repository. That file must contain these resolved values:
-
-```dotenv
-OPENPROJECT_URL=https://openproject.example.com
-OPENPROJECT_API_TOKEN=<resolved token; never commit this>
-```
-
-Use these when the workbook does not supply an unambiguous value or when you want to
-lock the target explicitly:
-
-```dotenv
-OPENPROJECT_PROJECT_ID=project-identifier
-OPENPROJECT_INITIATIVE_ID=208
-```
-
-When creating a new OpenProject project, write its verified canonical identifier to the
-new repository's uncommitted `.env` as `OPENPROJECT_PROJECT_ID`. This field accepts the
-project identifier used by the OpenProject API; do not substitute a guessed name. Add
-`OPENPROJECT_INITIATIVE_ID` only after the target root work package exists.
-
-`OPENPROJECT_ROOT_WORK_PACKAGE_ID` or `OPENPROJECT_ROOT_ID` may be used instead of
-`OPENPROJECT_INITIATIVE_ID`. Keep an untracked `.env` with a secret reference (rather
-than a raw token), then generate the ignored `.env.resolved` through Wood Secrets:
-
-```dotenv
-OPENPROJECT_URL=https://openproject.example.com
-OPENPROJECT_API_TOKEN=vaultwarden://openproject/wood-tools/api-token#OPENPROJECT_API_TOKEN
-OPENPROJECT_PROJECT_ID=project-identifier
-OPENPROJECT_INITIATIVE_ID=208
-```
-
-```bash
-wood-secrets resolve-env --input .env --output .env.resolved --apply
-```
-
-Commit a `.env.example` containing only the variable names and non-sensitive examples.
-Add `.env` and `.env.resolved` to the repository's `.gitignore`. If a repository uses
-one explicit environment file outside its root, pass its absolute path with `--env-file`
-instead of copying a token or resolved file into the repository.
-
-## Workbook contract
-
-The `Implementation` sheet has 21 columns. `Version` is an R# planning release,
-such as `R1 — Codex Foundations`, ordered by its numeric R identifier. Story
-traceability includes `Project`, `Version`, `Primary Repository`, `Affected
-Repositories`, `Predecessors`, and `Released In`. The importer reads all 21
-columns and accepts older 18-column workbooks with empty traceability fields.
-Repository fields are persisted in Story descriptions and recovered on export.
-Planning and apply require `Released In` to be blank. They never infer a repository
-artifact version from the R# planning release. The owning project follows the
-Domain/Platform outcome rule.
-
-After the repository artifact is shipped and the Story is closed, use
-`record-release` with the actual semantic version. Its default mode previews the
-update; `--apply` updates the OpenProject Story and workbook. Reapplying the same
-version makes no changes. A conflicting existing value is rejected.
-
-On successful apply, the CLI verifies writes before reporting them and writes confirmed
-Story OpenProject IDs and root metadata back into the workbook. These write-backs are
-part of idempotency and should be retained.
-
-## Safety conditions
-
-- An ambiguous match blocks planning; do not choose one manually.
-- A supplied `OpenProject ID` must resolve to a Story below the intended root work
-  package. IDs outside that tree block planning.
-- Save the exact plan and apply JSON in the run directory. Store only operational
-  records there; do not copy authentication material.
-- Keep the workbook in its owning repository or its approved shared project location.
-  Do not use `~/.wood` as the canonical store for every team's workbook.
-
-## Per-repository onboarding
-
-No repository-local pointer to the Codex skill is required: Codex discovers the shared
-skill through `~/.codex/skills/openproject-implementation`. The implementation workbook
-commands themselves do not require `project.json`; they use the workbook and
-`--env-file`. Add `project.json` only when the repository also uses Wood Tools' broader
-project/registry workflows.
-
-Before an apply, confirm that the repository, workbook metadata, resolved environment,
-and planned root work package all identify the same delivery backlog.
+Keep credentials in Infisical. Save only JSON plans and apply results in the local run directory. Stop on ambiguous matches, stale IDs, or missing credentials. The `wood` v2 CLI has no workbook export or manual release-recording command; use the supported import and Story evidence workflow.
