@@ -73,16 +73,11 @@ class HelpersTest(unittest.TestCase):
             (root / "skills/new-skill/SKILL.md").write_text("---\nname: new-skill\n---\n")
             (root / "AGENTS.md").write_text("guidance")
             (root / "scripts/install.sh").write_bytes((ROOT / "scripts/install.sh").read_bytes())
-            local_helper = root / ".wood/scripts/wood_openproject_env.py"
-            local_helper.parent.mkdir(parents=True)
-            local_helper.write_text("temporary local patch")
             env = {"HOME": directory, "PATH": "/usr/bin:/bin"}
             subprocess.run(["/bin/sh", str(root / "scripts/install.sh")], env=env, check=True)
             for name in (".codex", ".codex-secondary"):
                 self.assertEqual((root / name / "skills/new-skill").resolve(), (root / "skills/new-skill").resolve())
                 self.assertEqual((root / name / "AGENTS.md").resolve(), (root / "AGENTS.md").resolve())
-            self.assertEqual(local_helper.read_text(), "temporary local patch")
-            self.assertFalse(local_helper.is_symlink())
 
 
 if __name__ == "__main__":

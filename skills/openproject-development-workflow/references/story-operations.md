@@ -5,16 +5,17 @@ repository configuration and use Infisical in `dev` at `/openproject` to inject
 `OPENPROJECT_API_TOKEN`. Set `OPENPROJECT_PROJECT_ID` when available. The Story
 commands use the single public `wood` executable.
 
-Before a release updates the installed executable, run these examples from the
-Wood Tools checkout with `uv run --active --frozen wood`. In another repository,
-use the installed `wood` only after `wood story --help` confirms this command group.
+In the Wood Tools checkout under review, use `uv run --active --frozen wood`.
+In another repository, use the installed `wood` after `wood story --help` confirms
+this command group. Keep the command's working directory in the Story repository;
+`story start` checks its repository name and working tree.
 
 ```sh
 OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
-infisical run --env=dev --path=/openproject -- uv run --active --frozen wood story next 208 --json
+infisical run --env=dev --path=/openproject -- wood story next 208 --json
 
 OPENPROJECT_URL=https://projects.woodhost.cloud OPENPROJECT_PROJECT_ID=3 \
-infisical run --env=dev --path=/openproject -- uv run --active --frozen wood story get 399 --json
+infisical run --env=dev --path=/openproject -- wood story get <id> --json
 ```
 
 `next` selects an eligible Story in the earliest active R# release. Closed and Rejected
