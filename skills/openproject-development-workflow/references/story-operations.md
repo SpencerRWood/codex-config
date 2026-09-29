@@ -2,8 +2,12 @@
 
 Run these commands from the Story's repository. Use Infisical in `dev` at
 `/openproject` to inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`.
-Discover the project and initiative IDs through `wood project list --json`. The Story
-commands use the single public `wood` executable.
+Discover the project and initiative IDs through `wood project list --json` when needed.
+Run from the target repository with an installed `wood` executable. The Story commands
+read optional `[tool.wood.openproject] initiative_id` and `project_id` from that
+repository's root `pyproject.toml`, regardless of the executable's virtual environment.
+If that mapping is absent, pass the Initiative reference explicitly. An explicit
+reference overrides the mapping.
 
 In the Wood Tools checkout under review, use `uv run --active --frozen wood`.
 In another repository, use the installed `wood` after `wood story --help` confirms
@@ -16,7 +20,8 @@ infisical run --env=dev --path=/openproject -- wood story next 208 --json
 infisical run --env=dev --path=/openproject -- wood story get <id> --json
 ```
 
-`next` selects an eligible Story in the earliest active R# release. Closed and Rejected
+Omit `208` when the repository has an Initiative mapping. `next` selects an
+eligible Story in the earliest active R# release. Closed and Rejected
 Stories are terminal; a Rejected predecessor does not satisfy a dependency. Blocked
 and unversioned Stories are ineligible. If no Story is returned, report that condition.
 Use `get --offset N` if the packet includes more than 50 description chunks.
