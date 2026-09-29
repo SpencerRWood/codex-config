@@ -1,3 +1,3 @@
 # Wood Tools local override
 
-Use the shared personal guidance and applicable skills for this checkout. The existing `AGENTS.md` in this checkout is intentionally superseded on this machine.
+Use the shared personal guidance, this checkout's local root `AGENTS.md`, and applicable skills. Keep the root guidance local-only.

@@ -34,10 +34,13 @@ credential is read from `~/.wood/runtime/openproject.env`.
    merged local Story branch with `git branch -d <branch>`, and delete its remote branch
    with `git push origin --delete <branch>`. When the PR used squash or rebase merging,
    `git branch -d` may reject the equivalent local commit; force-delete only that exact
-   local branch after verifying its merged PR or patch equivalence. Story closure is
-   separate: after the PR is merged and the user approves closure, preview then run
-   `wood-set-story-status <id> --status "Closed" --apply`. When requesting execution
-   approval, use the reusable command prefix `wood-set-story-status`, not a
+   local branch after verifying its merged PR or patch equivalence. The post-review
+   approval also authorizes closure of that Story after the PR is confirmed merged and
+   all applicable required checks have passed, including post-merge validation when
+   configured. Read the live OpenProject status, preview the transition, then run
+   `wood-set-story-status <id> --status "Closed" --apply` and verify the result. Do not
+   close while a required check is pending, failed, or unavailable. When requesting
+   execution approval, use the reusable command prefix `wood-set-story-status`, not a
    Story-ID-specific prefix.
 
 ## Planning Increment loop authorization
@@ -75,4 +78,5 @@ returning a terminal response between loop iterations.
   uncommitted work outside the requested scope, or the OpenProject environment is not
   resolved.
 - Do not create a branch, commit, push, PR, or close a Story as an implicit consequence
-  of selecting it. Each occurs only at the approval point above.
+  of selecting it. Closure follows only the individual post-review approval and the
+  verified merge and checks described above.
