@@ -5,9 +5,11 @@ description: "Execute an OpenProject Story through the shared development workfl
 
 # OpenProject development workflow
 
-Apply this workflow from the repository that owns the Story. Use Infisical to inject
-`OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`. Resolve the project and initiative
-IDs from repository context or `wood project list --json`. Use the public `wood story` commands as described in
+Apply this workflow from the repository that owns the Story, using an installed `wood`
+executable. Use Infisical to inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN`.
+The repository root `pyproject.toml` may map `[tool.wood.openproject] initiative_id`
+and optional `project_id`; pass an explicit Initiative reference when it has no mapping.
+Use the public `wood story` commands as described in
 [Story operations](references/story-operations.md). Before use, verify the selected
 `wood` executable exposes `story`. In a Wood Tools checkout under review, use
 `uv run --active --frozen wood` so commands invoke the checked-out implementation.
@@ -18,7 +20,8 @@ workflow; approval of one exact command does not give later commands network acc
 Network permission does not replace the Story mutation and review approvals below.
 
 1. Use `wood doctor --json` when environment readiness is uncertain. Run
-   `wood story next <initiative-ref> --json`, then `wood story get <id> --json`.
+   `wood story next [initiative-ref] --json`, then `wood story get <id> --json`.
+   Omit the reference only when the target repository has the pyproject mapping.
    Read the goal, acceptance criteria, dependencies, and target release before editing.
 2. With explicit approval to start that Story, preview then apply
    `wood story start <id> --json`. Verify the returned In progress status and local
