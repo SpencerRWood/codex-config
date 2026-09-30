@@ -4,6 +4,13 @@ This repository is the shared source for the `codex` and `codex2` CLI profiles o
 
 Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skills/*/SKILL.md` folder into both Codex homes. The installer refuses to replace existing files or directories. The Wood Tools override is local to this Mac and excluded from that checkout's Git status.
 
+Use `wood epic list/get` and `wood release list/get` with `--json` for live
+OpenProject planning inspection (requires a Wood Tools version exposing these
+commands). Both groups accept project context; get accepts an ID or exact name.
+Edit repository code and tests directly instead of writing temporary Python
+file generators. Check command help or `wood contract --json` before explaining
+and using a fallback for an unsupported operation.
+
 `brief-check` runs a command, saves its full combined output locally, and returns compact JSON. For example: `python3 scripts/brief-check.py -- sh -c 'printf "ok\\n"'`. `session-handoff` produces a concise fresh-session checkpoint. To measure local usage, run `python3 scripts/token-report.py --since YYYY-MM-DD`; it reads saved rollouts and reports totals and largest sessions. It does not monitor sessions in the background.
 
 ## Wood Tools v2 workflow

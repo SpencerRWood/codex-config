@@ -73,6 +73,23 @@ passed GitHub Actions run for a repository Story. Keep secret values out of
 comments and evidence. Infisical supplies credentials; semantic-release owns
 version changes, tags, and GitHub Releases.
 
+For live planning inspection, use `wood epic list --json`,
+`wood epic get <id|exact-name> --json`, `wood release list --json`, and
+`wood release get <id|exact-name> --json`. Project context comes from the
+repository mapping; use `--project <id>` to override it. Lists accept `--status`
+and `--offset`; Epic get pages child Stories with `--offset`. Epic get reports
+current child statuses, completion readiness, and whether the Epic is already
+complete. Rejected Stories do not block readiness. Release means an OpenProject
+planning version, not a GitHub release. Use these reads when parent verification
+or release selection is needed, rather than reproducing API queries in Python.
+
+Before falling back to a custom script, check `wood contract --json` or command
+help for the supported operation. Explain the missing capability or focused
+diagnostic need. Edit repository code and tests directly with patch/edit tools;
+do not write temporary Python scripts merely to generate or modify those files.
+Existing checked-in scripts and skills remain appropriate for their supported
+workflows.
+
 ## Planning Increment loop
 
 When the user explicitly authorizes a named Planning Increment loop, that
