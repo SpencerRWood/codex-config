@@ -10,6 +10,14 @@ The preview is read-only. `--project` and `--initiative` select a target when me
 
 The `Implementation` sheet models the project, R# planning version, Epic, Story, repository traceability, and predecessors. `Released In` stays blank during planning; R# is not an artifact version. The command reuses unambiguous matches, verifies writes, and records confirmed OpenProject IDs and root metadata in the workbook. Preserve those write-backs for idempotent reruns.
 
-When the import creates a project or initiative, discover its canonical ID from the verified apply result and a fresh `wood project list --json` readback. Pass selectors explicitly when the workbook metadata is ambiguous.
+When the import creates a project or initiative, reuse its canonical ID from the
+verified apply result and preserved workbook write-back. A fresh `wood project list
+--json` readback is needed only if the returned verification is missing or later
+state invalidates it. Pass selectors explicitly when workbook metadata is ambiguous.
+
+For repository hierarchy setup without Story/workbook changes, use `wood hierarchy
+plan` and `wood hierarchy ensure --apply --plan-hash <reviewed-hash> --json`; that
+command verifies relationships and persists repository context. It does not replace
+workbook import or export functionality. See the [representative workflow](../../../docs/wood-delivery-workflow.md).
 
 Keep credentials in Infisical. Save only JSON plans and apply results in the local run directory. Stop on ambiguous matches, stale IDs, or missing credentials. The `wood` v2 CLI has no workbook export or manual release-recording command; use the supported import and Story evidence workflow.

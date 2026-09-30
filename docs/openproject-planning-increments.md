@@ -39,3 +39,16 @@ The [development workflow](../skills/openproject-development-workflow/SKILL.md)
 governs Story status, branch preparation, review, and closure. Inject OpenProject
 credentials with Infisical. Python semantic-release owns artifact versions, tags,
 and GitHub Releases; the planning increment remains independent of those releases.
+
+For authorized hierarchy setup without workbook Story changes, use
+`wood hierarchy plan --json` followed by `wood hierarchy ensure --apply --plan-hash
+<reviewed-hash> --json` with the same project/Initiative/Release/Epic selectors.
+Reuse the verified mapping rather than manually matching or creating those objects.
+
+After an approved Story merges, use `wood delivery status <id> --json` for one
+delivery-chain briefing, `wood repo verify --json` for applicable repository-owned
+checks, and `wood story evidence` with the saved validation/verification records.
+Keep this deterministic evidence separate from implementation narrative. Reuse the
+returned fields in the next Story briefing or handoff; a new repository requires
+its own context and validation. The [representative workflow](wood-delivery-workflow.md)
+shows the finalized command shapes and explicit unsupported-workflow fallbacks.

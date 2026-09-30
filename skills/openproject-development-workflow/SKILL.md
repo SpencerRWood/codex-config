@@ -7,10 +7,17 @@ description: "Execute an OpenProject Story through the shared development workfl
 
 Work from the Story's repository. Use the supported `wood` CLI; in a Wood Tools
 checkout under review, use `uv run --active --frozen wood`. Confirm the selected
-executable exposes the needed commands. Inject OpenProject credentials with
+executable exposes the needed commands with `wood contract --json` once, and
+reuse that capability result. Wood Tools is the first control surface for supported
+OpenProject, repository, CI, delivery, verification, and hierarchy operations.
+Consume bounded JSON and retain returned IDs, revisions, hashes, and file paths;
+do not reconstruct those facts with additional system queries. Inject credentials with
 `infisical run --env=dev --path=/openproject --`. Run Infisical-backed commands
 with network permission from their first attempt. A repository may provide
 `[tool.wood.openproject]` context; pass an Initiative reference only when needed.
+If this repository has no Infisical context, point `infisical run` at the existing
+authorized context with `--project-config-dir <directory>`; keep the child command
+in the Story repository. Never copy secret values into a checkout.
 
 1. Run `wood doctor --json` when readiness is uncertain. Select with
    `wood story next --json` (or an explicit Initiative), then read
@@ -22,7 +29,15 @@ with network permission from their first attempt. A repository may provide
    Preserve unrelated changes; use an isolated clean worktree if another Story
    has unfinished work. Do not push merely to expose a branch.
 3. Run `wood repo info --json` and `wood repo standards --json` once to read
-   the repository contract. Implement the Story's accepted scope. The CLI owns
+   the repository contract. If authorized work needs hierarchy provisioning,
+   use `wood hierarchy plan --project <project> --initiative <initiative>
+   --release <release> --epic <epic> --json`. Review its operations, proposed
+   mapping, and `plan_hash`; apply the same selectors with `wood hierarchy ensure
+   --apply --plan-hash <reviewed-hash> --json`. Omitted selectors use repository
+   mapping IDs. Retain the verified mapping; numeric misses, duplicate names,
+   conflicting relationships, and stale plans require fresh inspection. See the
+   [representative workflow](../../docs/wood-delivery-workflow.md) for scope and retries.
+   Implement the Story's accepted scope. The CLI owns
    project selection, dependency and status checks, and branch preparation.
 4. Run `wood repo validate --json` after edits. Retain its `data.validation_file`
    and log paths; the record binds passed checks to the validated file contents,
@@ -34,23 +49,50 @@ with network permission from their first attempt. A repository may provide
    Do not commit, push, open a PR, merge, or close until the user approves
    that reviewed batch.
 6. After approval, commit and push the reviewed Story branch and open a PR to
-   `main`. Use `wood ci status --json` for current centralized validation;
+   `main`. Wood Tools does not create or merge PRs; use `gh` for those operations.
+   Use `wood ci status --json` for current centralized validation;
    use `wood ci failures --json` to diagnose failures. Verify PR checks on the
    Story commit and confirm the PR merged. If deployment applies, inspect
    `wood deploy status --json`. Never treat stale, pending, failed, or
    unavailable checks as passed. After merge, fast-forward local `main` and
    remove the merged Story branches; force-delete a local branch only after
    verifying a squash or rebase merge.
-7. After merge, preview `wood story evidence <id> --validation <validation-file>
+7. After merge, run `wood delivery status <id> --json` once from the Story checkout.
+   Reuse its `fields`, `delivery_stage`, `blocker`, and `next_action` for the delivery
+   briefing. A successful envelope means reconciliation completed, not that all
+   stages passed. `not_applicable` is distinct from `unavailable`, `failed`, or
+   pending delivery. Resolve applicable blockers before claiming delivery; refresh
+   only after a relevant state change. There is no delivery watch command.
+   If the repository declares `[tool.wood.verify]`, run `wood repo verify --json`
+   against the implementation being delivered, with the required environment.
+   Retain `data.verification_file`, source fingerprint, check states, and log paths.
+   Required checks must pass; optional failures remain disclosed. Missing or
+   malformed contracts fail clearly: do not invent verification, or report a
+   verification requirement satisfied because no contract exists. Repositories
+   with no applicable application verification can omit this step with the reason.
+   Verification is separate from development validation; repository authors own
+   retry-safe checks. Do not rerun a passing saved result unless source, contract,
+   environment, or the observation's relevance has changed.
+   Preview `wood story evidence <id> --validation <validation-file>
    --pr <number> --ci-run <run-id> --json`, then use `--apply` to generate the
-   delivery files. Retain `data.evidence_file` and `data.update_file`. The command
+   delivery files. When verification applies, pass `--verification <verification-file>`
+   on both calls. Retain `data.evidence_file`, `data.update_file`, and the returned
+   deterministic `delivery` snapshot; keep that evidence separate from narrative.
+   The command
    requires a clean checkout containing the merge, a standard `feature/op-<id>-`
    PR branch, matching validated contents, all required logs, and passed validation
    CI on the source or merge revision. Use the explicit verified run ID from PR
    checks when `wood ci status` reports an unrelated latest run as stale.
 8. Post the generated update using `wood story activity add <id>
    --evidence <evidence-file> --json` (preview, then `--apply`). Verify the returned
-   activity ID. Read the live Story, then preview and apply
+   activity ID. To inspect or repair an existing summary, use `wood story activity
+   list <id> --json` and its `summary_activity_id`, `summary_count`, and activity
+   `sha256`; page with `--offset` if needed. Multiple summaries require resolution.
+   For an authorized summary update, preview `wood story activity summary <id>
+   --evidence <evidence-file> --expected-sha256 <observed-hash> --json`, then apply.
+   Creation uses `--expected-sha256 absent`; ordinary progress uses activity add
+   with `--file` and a distinct heading. Do not overwrite unseen or changed content.
+   Read the live Story, then preview and apply
    `wood story complete <id> --evidence <evidence-file> --json`. Both consumers
    reverify the generated record and current PR/CI state. Verify Closed. Keep the
    Story open if evidence cannot be posted or verified. Closure does not create
@@ -66,6 +108,9 @@ contents again before generation. Never rerun passing validation solely because
 the same contents were committed. Fetch a missing PR source revision if needed.
 For unsupported repositories or evidence workflows, explain the limitation and
 use the existing `--file` activity input and evidence format with verified facts.
+The [representative workflow](../../docs/wood-delivery-workflow.md) specifies that
+fallback format. Disclose its weaker source binding, retain the actual check logs,
+and independently verify CI against the delivered revision before completion.
 
 `wood story` lifecycle commands preview by default and mutate only with
 `--apply`. The completion evidence must include passed repository checks and a
@@ -83,12 +128,22 @@ complete. Rejected Stories do not block readiness. Release means an OpenProject
 planning version, not a GitHub release. Use these reads when parent verification
 or release selection is needed, rather than reproducing API queries in Python.
 
-Before falling back to a custom script, check `wood contract --json` or command
-help for the supported operation. Explain the missing capability or focused
-diagnostic need. Edit repository code and tests directly with patch/edit tools;
+Before falling back to direct GitHub/OpenProject/infrastructure access or a custom
+script, use the retained contract result or command help to establish the missing
+capability, unsupported repository workflow, or focused diagnostic gap. Explain
+that limitation once. Do not bypass ambiguity, stale plans, failed verification,
+or credential errors by switching to a direct API. Do not add compatibility
+wrappers or duplicate helpers for capabilities now owned by Wood Tools.
+Edit repository code and tests directly with patch/edit tools;
 do not write temporary Python scripts merely to generate or modify those files.
 Existing checked-in scripts and skills remain appropriate for their supported
 workflows.
+
+At a repository or delivery boundary, brief from the latest verified Wood Tools
+snapshot and saved records. Include observation time, Story/repository/branch,
+source and merge revisions, PR/CI IDs, validation and verification file/log paths,
+blockers, and `next_action`. Use `none` or the reported unavailability reason for
+missing facts; a handoff does not upgrade pending observations to passed evidence.
 
 ## Planning Increment loop
 
@@ -96,5 +151,9 @@ When the user explicitly authorizes a named Planning Increment loop, that
 authorization covers selection, start, implementation, and validation of each
 dependency-ready Story. Stop at review for each Story. Approval of one review
 authorizes delivery and closure of only that Story; after it closes, continue
-to the next eligible Story. Do not end a loop turn after partial implementation
+to the next eligible Story using `wood story next --json`. Reuse the previous
+closeout result until selection or the next mutation changes it; do not audit the
+same delivery chain again. A successor in another repository uses that checkout
+and its own contract/records. Approval of one Story never approves the next review.
+Do not end a loop turn after partial implementation
 or an initial check when useful work remains.
