@@ -24,7 +24,9 @@ with network permission from their first attempt. A repository may provide
 3. Run `wood repo info --json` and `wood repo standards --json` once to read
    the repository contract. Implement the Story's accepted scope. The CLI owns
    project selection, dependency and status checks, and branch preparation.
-4. Run `wood repo validate --json` after edits. Fix failures using its log paths.
+4. Run `wood repo validate --json` after edits. Retain its `data.validation_file`
+   and log paths; the record binds passed checks to the validated file contents,
+   including uncommitted implementation changes. Fix failures using its log paths.
    Use repository-specific checks only for an unsupported or unavailable check,
    or to diagnose a failure. Do not rerun passing checks without a relevant
    change or claim an unavailable check passed.
@@ -39,15 +41,31 @@ with network permission from their first attempt. A repository may provide
    unavailable checks as passed. After merge, fast-forward local `main` and
    remove the merged Story branches; force-delete a local branch only after
    verifying a squash or rebase merge.
-7. Post one concise implementation update using
-   `wood story activity add <id> --file <comment-file> --json` (preview, then
-   `--apply`). Start it with `Implementation update (WP-<id>)`; include what
-   shipped, PR and merge commit, validation and CI links, release tag when
-   applicable, and limitations. Verify the returned activity ID. Read the live
-   Story, then preview and apply
-   `wood story complete <id> --evidence <evidence-file> --json` only after
-   required checks pass. Verify Closed. Keep it open if evidence cannot be
-   posted or verified. Closure does not create a release.
+7. After merge, preview `wood story evidence <id> --validation <validation-file>
+   --pr <number> --ci-run <run-id> --json`, then use `--apply` to generate the
+   delivery files. Retain `data.evidence_file` and `data.update_file`. The command
+   requires a clean checkout containing the merge, a standard `feature/op-<id>-`
+   PR branch, matching validated contents, all required logs, and passed validation
+   CI on the source or merge revision. Use the explicit verified run ID from PR
+   checks when `wood ci status` reports an unrelated latest run as stale.
+8. Post the generated update using `wood story activity add <id>
+   --evidence <evidence-file> --json` (preview, then `--apply`). Verify the returned
+   activity ID. Read the live Story, then preview and apply
+   `wood story complete <id> --evidence <evidence-file> --json`. Both consumers
+   reverify the generated record and current PR/CI state. Verify Closed. Keep the
+   Story open if evidence cannot be posted or verified. Closure does not create
+   a release. Add a separate factual activity for material release or deployment
+   details and limitations that the generated update does not capture.
+
+Generated files and logs use the current repository's `[tool.wood.workflow]`
+`output_directory` in `pyproject.toml`, defaulting to `/private/tmp`. Use returned
+paths rather than inventing filenames or manually constructing routine evidence.
+Files are temporary: retain them through delivery. If removed, regenerate them;
+if the validation record or logs are missing, validate the exact implementation
+contents again before generation. Never rerun passing validation solely because
+the same contents were committed. Fetch a missing PR source revision if needed.
+For unsupported repositories or evidence workflows, explain the limitation and
+use the existing `--file` activity input and evidence format with verified facts.
 
 `wood story` lifecycle commands preview by default and mutate only with
 `--apply`. The completion evidence must include passed repository checks and a
