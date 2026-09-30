@@ -25,7 +25,7 @@ Story's actual repository semantic-release version is known, enter that version
 without changing its Planning Increment. A GitHub Release is the published
 repository artifact record, separate from both fields.
 
-`wood story next <initiative-ref> --json` scans active R# Planning Increments
+`wood story next --json` uses repository context when available and scans active R# Planning Increments
 in numeric order and selects a Story whose predecessors are closed. A Planning Increment is
 complete when all included Stories are closed and shipped Stories have release
 traceability where practical. Completion does not require a single repository

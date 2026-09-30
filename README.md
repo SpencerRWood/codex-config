@@ -8,19 +8,21 @@ Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skill
 
 ## Wood Tools v2 workflow
 
-The public execution contract is `wood`. Check `wood contract --json` for available commands. Inject `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN` through Infisical, discover project and initiative IDs with `wood project list --json`, then use the [Story workflow](skills/openproject-development-workflow/SKILL.md) for its review and closure gates. The operational loop is:
+The public execution contract is `wood`. Check `wood contract --json` for available commands. Inject OpenProject credentials through Infisical and use the [Story workflow](skills/openproject-development-workflow/SKILL.md) for review and closure policy. Repositories with `[tool.wood.openproject]` context can omit the Initiative reference:
 
 ```text
 wood doctor --json                         # readiness when uncertain
-wood project list --json                   # discover project and initiative
-wood story next <initiative> --json        # select, then story get <id> --json
-wood story start <id> --json               # preview, then --apply after start approval
-implement; wood repo validate --json       # local evidence, then review
-wood ci status --json                       # current commit after delivery
-wood story complete <id> --evidence <file> --json  # preview, then --apply after merge and checks
+wood story next --json
+wood story get <id> --json
+wood story start <id> --apply --json
+# implement and review
+wood repo validate --json
+wood ci status --json
+wood story activity add <id> --file <update-file> --apply --json
+wood story complete <id> --evidence <evidence-file> --apply --json
 ```
 
-The skill retains the status, branch, CI, implementation update, and review safeguards. Workbook imports use `wood project import-workbook` with a reviewed plan hash. Infisical supplies secret values; Python semantic-release owns version, tag, and GitHub Release changes. The former multi-command workbook and Story instructions have been reduced to this one public command path and two focused skills. See the [cutover inventory](docs/wood-v2-cutover.md) for removed components and instruction-size measurements.
+The Story skill defines status, branch, CI, review, and evidence safeguards. Workbook imports use `wood project import-workbook` with a reviewed plan hash. Infisical supplies secret values; Python semantic-release owns version, tag, and GitHub Release changes.
 
 Completed audit findings are saved to the shared Google Drive `Logs/` folder through the `audit-findings-log` skill, unless the specific audit request prohibits Drive writes. The installer links the skill into both Codex homes.
 
