@@ -59,6 +59,15 @@ requires an explained missing capability or diagnostic gap. Wood Tools does not
 manage PR creation/merge, so those remain `gh` operations. Ambiguity, failed checks,
 stale plans, and missing credentials do not justify bypassing its safeguards.
 
+Enhanced delivery status also reports `observed_at`, `merged_revision`, the exact
+revision-bound `release_run` and attempt, and bounded `release_jobs` diagnostics.
+Use its returned diagnostic or wait action and retain truncation flags. Save full
+diagnostic logs through `brief-check`. Release-job success does not establish an
+image digest, deployment revision, or runtime health. The
+[representative workflow](docs/wood-delivery-workflow.md) describes these fields
+and installation-drift handling; older installed binaries may expose the command
+without the enhanced fields.
+
 The audit of this repository found no duplicated OpenProject control scripts to
 remove. `brief-check`, token reporting, installation, and local session recovery
 remain Codex-specific; see the [helper coverage record](docs/wood-delivery-workflow.md#helper-coverage).

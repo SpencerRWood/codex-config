@@ -19,6 +19,11 @@ If this repository has no Infisical context, point `infisical run` at the existi
 authorized context with `--project-config-dir <directory>`; keep the child command
 in the Story repository. Never copy secret values into a checkout.
 
+An installed executable can lag behind the Wood Tools checkout. If its contract
+lacks a required capability, distinguish installation drift from a source capability
+gap before selecting a fallback. Reuse the verified executable for the workflow;
+do not guess flags or assume a command name proves that newer result fields exist.
+
 1. Run `wood doctor --json` when readiness is uncertain. Select with
    `wood story next --json` (or an explicit Initiative), then read
    `wood story get <id> --json`. Read the goal, acceptance criteria, dependencies,
@@ -62,7 +67,17 @@ in the Story repository. Never copy secret values into a checkout.
    briefing. A successful envelope means reconciliation completed, not that all
    stages passed. `not_applicable` is distinct from `unavailable`, `failed`, or
    pending delivery. Resolve applicable blockers before claiming delivery; refresh
-   only after a relevant state change. There is no delivery watch command.
+   only after a relevant state change. Retain `observed_at`, the verified
+   `fields.merged_revision`, and `fields.release_run` with its run ID, attempt,
+   revision, conclusion, and authority link. `release_jobs` carries bounded
+   unsuccessful/pending job diagnostics; `release_jobs_truncated` and each job's
+   `steps_truncated` disclose omitted entries. Follow a returned diagnostic command
+   using its exact run/attempt/job IDs and save full output with `brief-check`;
+   do not recreate discovery or dump logs into context. A pending attempt calls
+   for waiting on that run, then one refresh after completion. There is no delivery
+   watch command. Successful release/promotion jobs do not establish the separate
+   image digest, deployed revision, or runtime verification fields. Those fields
+   remain unavailable until their own authority supplies verified evidence.
    If the repository declares `[tool.wood.verify]`, run `wood repo verify --json`
    against the implementation being delivered, with the required environment.
    Retain `data.verification_file`, source fingerprint, check states, and log paths.
@@ -141,8 +156,9 @@ workflows.
 
 At a repository or delivery boundary, brief from the latest verified Wood Tools
 snapshot and saved records. Include observation time, Story/repository/branch,
-source and merge revisions, PR/CI IDs, validation and verification file/log paths,
-blockers, and `next_action`. Use `none` or the reported unavailability reason for
+source and merge revisions, PR/CI IDs, exact release-run ID/attempt, relevant job
+IDs and truncation flags, validation and verification file/log paths, blockers,
+and `next_action`. Use `none` or the reported unavailability reason for
 missing facts; a handoff does not upgrade pending observations to passed evidence.
 
 ## Planning Increment loop
