@@ -47,13 +47,34 @@ validation record and log paths through delivery. CI must be completed and passe
 on the source or merged revision; stale latest-run results cannot substitute for it.
 
 `delivery status` returns one observation with `story_id`, normalized `fields`,
-`delivery_stage`, `blocker`, and `next_action`. For example, an available PR/CI with
+`observed_at`, `delivery_stage`, `blocker`, and `next_action`. For example, an available PR/CI with
 an unavailable release can produce stage `release` and a next action to inspect
 the release. A success envelope means the query succeeded, not that delivery is
 complete. Follow the returned action; refresh after a relevant mutation or authority
 state change, not in a long-lived watch loop. `--pr` disambiguates verified PR
 linkage and `--environment` selects deployment context when necessary. When a stage
 is not applicable, retain its reason rather than inventing release/deployment data.
+
+Enhanced reports include `fields.merged_revision` and `fields.release_run`, whose
+value identifies the revision-bound run ID, current attempt, status, and conclusion.
+The query reads at most 100 jobs from that exact attempt once. `release_jobs`
+returns up to five unsuccessful/pending jobs with authority links and at most three
+failed step names each; names are capped at 160 characters. Preserve
+`release_jobs_truncated` and each job's `steps_truncated`. Follow the supplied
+publication/promotion/deployment diagnostic or wait action. For an exact
+`gh run view` diagnostic, use `brief-check` to save its full output using the
+returned run/attempt/job IDs. Do not repeat discovery or infer omitted entries.
+PR and validation blockers take precedence over release diagnostics.
+
+Actions success proves workflow execution only. It does not populate missing
+image digest, infrastructure deployment, or runtime health evidence. A published
+container with successful promotion can still lack a generic GitHub deployment
+record; retain the unavailable fields and disclose that authority gap. The run
+field is supplemental: absence of a discoverable run does not invalidate separately
+verified delivery facts. `observed_at` timestamps this query, not a prior runtime
+attestation. An older installed binary can expose the command without these fields;
+check the selected result and distinguish installation drift from missing source
+functionality before switching to direct tools.
 
 `repo verify` executes declared retry-safe argument arrays from `[tool.wood.verify]`.
 The repository owns application semantics; Wood Tools owns bounded results,
@@ -73,7 +94,8 @@ verification, blockers, and next action. No extra OpenProject/GitHub/infrastruct
 queries are needed merely to restate those returned facts.
 
 These outputs have different shapes: `delivery status` supplies `fields`,
-`delivery_stage`, `blocker`, and `next_action`; evidence's `delivery` is a map of
+`observed_at`, `release_jobs`, `delivery_stage`, `blocker`, and `next_action`;
+evidence's `delivery` is a map of
 field states, values, and sources without stage/action metadata. Preserve the
 returned shape and mark absent metadata unavailable. Record the local observation
 time when no timestamp is returned.

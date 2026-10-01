@@ -15,6 +15,11 @@ repository validation and verification. Use `wood repo validate --json`,
 reuse their structured result and returned log paths instead of wrapping them or
 running a second check. For a Story delivery briefing, consume an existing
 `wood delivery status <id> --json` snapshot and its stage, blocker, and next action.
+When that action is an exact `gh run view` diagnostic, use its returned run ID,
+attempt, and job ID with this helper to retain the full log and return a bounded
+summary. Inspect the saved log only for the named failed steps or omitted details
+identified by the delivery report's job/step truncation flags. Do not wrap the
+delivery query itself or introduce repeated status sampling.
 Use this helper for an explained unsupported repository check or a Codex-specific
 diagnostic whose raw output would otherwise be large. Its `success` describes
 the command exit, not Story delivery completion.

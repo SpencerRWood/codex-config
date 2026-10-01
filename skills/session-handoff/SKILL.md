@@ -14,6 +14,13 @@ mutation made it stale. Record the observation time, Story and repository, branc
 source/merge revisions, PR and CI identifiers, `delivery_stage`, `blocker`, and
 `next_action`. Envelope success alone does not prove delivery complete.
 
+For enhanced delivery reports, use `observed_at` as the query's observation time
+and retain `fields.merged_revision`, `fields.release_run` (run ID, attempt,
+revision, conclusion, authority link), relevant `release_jobs` IDs/failed steps,
+and job/step truncation flags. Carry the exact returned diagnostic or wait action
+forward; do not rediscover its identifiers. Release-job success does not establish
+deployment or runtime health. Observation time does not refresh an older attestation.
+
 The two snapshot shapes differ: `delivery status` supplies `fields` and stage/action
 metadata, while evidence's `delivery` is a map of normalized field states, values,
 and sources. Preserve the shape actually returned. Record the local observation time
