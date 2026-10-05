@@ -2,7 +2,7 @@
 
 This repository is the shared source for the `codex` and `codex2` CLI profiles on this Mac. It contains global guidance, personal skills, and their supporting scripts and references. It does not contain account credentials, Codex runtime state, or the old Wood Tools `AGENTS.md`.
 
-Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skills/*/SKILL.md` folder into both Codex homes. The installer refuses to replace existing files or directories. The Wood Tools override is local to this Mac and excluded from that checkout's Git status.
+Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skills/*/SKILL.md` folder into both Codex homes. The installer refuses to replace existing files or directories. Installation is limited to the Codex homes; it does not write guidance or Git configuration into a Wood Tools checkout.
 
 Use `wood epic list/get` and `wood release list/get` with `--json` for live
 OpenProject planning inspection (requires a Wood Tools version exposing these
@@ -31,9 +31,11 @@ wood story next --json
 wood story get <id> --json
 wood story start <id> --json
 wood story start <id> --apply --json
-# implement
+# inspect existing implementation, implement, validate, and fix failures autonomously
 wood repo validate --json
-# stop for review; approval permits commit, push, and PR creation through gh
+# prepare implementation evidence inputs and proposed commit/PR summary
+# stop immediately before commit/push/PR creation for the Story skill's review
+# approval permits the reviewed batch's standard delivery and closure workflow
 wood ci status --json
 # after the approved PR merges; retain data.validation_file from repo validate
 wood delivery status <id> --json
@@ -47,7 +49,15 @@ wood story complete <id> --evidence <evidence-file> --json
 wood story complete <id> --evidence <evidence-file> --apply --json
 ```
 
-The Story skill defines status, branch, CI, review, and evidence safeguards. Workbook imports use `wood project import-workbook` with a reviewed plan hash. Infisical supplies secret values; Python semantic-release owns version, tag, and GitHub Release changes.
+The Story skill defines autonomous in-scope implementation through validation fixes,
+evidence preparation, and proposed commit/PR summaries. It requires no intermediate
+implementation approvals; the first normal approval boundary is immediately before
+commit/push/PR creation. Review includes changes, repositories, validation/test
+results, material decisions, and proposed commits/PRs. Separate tool/runtime
+approvals and scope/safety limits still apply. The skill also owns status, branch,
+CI, evidence, and closure safeguards. Workbook imports use `wood project
+import-workbook` with a reviewed plan hash. Infisical supplies secret values;
+Python semantic-release owns version, tag, and GitHub Release changes.
 
 Reuse the generated evidence path returned by Wood Tools for activity posting and completion. Logs and generated files follow `[tool.wood.workflow] output_directory` in the current repository's `pyproject.toml`, defaulting to `/private/tmp`. The workflow skill explains regeneration and unsupported-workflow fallbacks.
 

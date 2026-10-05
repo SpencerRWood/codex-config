@@ -22,9 +22,11 @@ wood story start <id> --json
 wood story start <id> --apply --json
 wood repo info --json
 wood repo standards --json
-# implement the packet's accepted scope
+# inspect existing implementation and implement the packet's accepted scope autonomously
 wood repo validate --json
-# stop for review; approval permits commit/push and PR creation/merge through gh
+# fix validation failures; prepare implementation evidence inputs and commit/PR summary
+# stop immediately before commit/push/PR creation for the Story skill's review
+# approval permits the reviewed batch's standard delivery and closure workflow
 wood ci status --json
 # after CI passes on the Story revision and the PR merge is verified
 wood delivery status <id> --pr <number> --json
@@ -39,6 +41,15 @@ wood story activity add <id> --evidence <evidence-file> --apply --json
 wood story complete <id> --evidence <evidence-file> --json
 wood story complete <id> --evidence <evidence-file> --apply --json
 ```
+
+The implementation request authorizes in-scope inspection, dependency verification,
+implementation, validation and failure fixes, evidence preparation, and proposed
+commit/PR summaries without intermediate approval prompts. At the first normal
+approval boundary, immediately before commit/push/PR creation, present changes,
+repositories, validation/test results, material decisions, and proposed commits/PRs;
+stop for approval. Prepare evidence inputs before review and generate final delivery
+evidence after verified merge/CI. Separate tool/runtime approvals and the Story
+skill's scope/safety limits remain in force.
 
 Read the selected packet once for repository, acceptance criteria, Planning
 Increment, and dependencies. `story start` verifies eligibility and prepares the
