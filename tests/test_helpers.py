@@ -1,6 +1,7 @@
 """Focused behavior checks for bounded output, token accounting, and discovery."""
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -11,6 +12,74 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class HelpersTest(unittest.TestCase):
+    def test_installer_leaves_neighboring_wood_tools_checkout_untouched(self):
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            source = home / "codex-config"
+            (source / "scripts").mkdir(parents=True)
+            (source / "skills").mkdir()
+            (source / "AGENTS.md").write_text("guidance")
+            installer = source / "scripts/install.sh"
+            installer.write_bytes((ROOT / "scripts/install.sh").read_bytes())
+            neighbor = home / "Projects/internal/Wood Tools/wood-tools"
+            (neighbor / ".git/info").mkdir(parents=True)
+            exclude = neighbor / ".git/info/exclude"
+            exclude.write_text("# existing local excludes\n")
+            subprocess.run(["/bin/sh", str(installer)],
+                           env={**os.environ, "HOME": directory}, check=True)
+            self.assertEqual(exclude.read_text(), "# existing local excludes\n")
+            self.assertFalse((neighbor / "AGENTS.override.md").is_symlink())
+            self.assertFalse((neighbor / "AGENTS.override.md").exists())
+
+    def test_installer_keeps_story_skill_canonical_and_propagates_updates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "source"
+            home = root / "profiles"
+            (source / "scripts").mkdir(parents=True)
+            skill = source / "skills/openproject-development-workflow"
+            skill.mkdir(parents=True)
+            canonical = ROOT / "skills/openproject-development-workflow/SKILL.md"
+            (skill / "SKILL.md").write_bytes(canonical.read_bytes())
+            (source / "AGENTS.md").write_bytes((ROOT / "AGENTS.md").read_bytes())
+            installer = source / "scripts/install.sh"
+            installer.write_bytes((ROOT / "scripts/install.sh").read_bytes())
+            env = {**os.environ, "HOME": str(home)}
+            subprocess.run(["/bin/sh", str(installer)], env=env, check=True)
+            installed = [home / profile / "skills" / skill.name
+                         for profile in (".codex", ".codex-secondary")]
+            for link in installed:
+                self.assertTrue(link.is_symlink())
+                self.assertEqual(link.resolve(), skill.resolve())
+                self.assertEqual((link / "SKILL.md").read_bytes(), canonical.read_bytes())
+            # Canonical changes propagate to both profiles without copying or rewriting.
+            updated = canonical.read_bytes() + b"\nCanonical update fixture.\n"
+            (skill / "SKILL.md").write_bytes(updated)
+            subprocess.run(["/bin/sh", str(installer)], env=env, check=True)
+            for link in installed:
+                self.assertEqual((link / "SKILL.md").read_bytes(), updated)
+
+    def test_installer_refuses_divergent_story_skill_without_overwriting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "scripts").mkdir()
+            skill = root / "skills/openproject-development-workflow"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_bytes(
+                (ROOT / "skills/openproject-development-workflow/SKILL.md").read_bytes())
+            (root / "AGENTS.md").write_text("guidance")
+            installer = root / "scripts/install.sh"
+            installer.write_bytes((ROOT / "scripts/install.sh").read_bytes())
+            divergent = root / ".codex/skills" / skill.name
+            divergent.mkdir(parents=True)
+            (divergent / "SKILL.md").write_text("local divergent content")
+            result = subprocess.run(["/bin/sh", str(installer)],
+                                    env={**os.environ, "HOME": directory},
+                                    capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(str(divergent), result.stderr)
+            self.assertEqual((divergent / "SKILL.md").read_text(), "local divergent content")
+
     def test_brief_check_success(self):
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(

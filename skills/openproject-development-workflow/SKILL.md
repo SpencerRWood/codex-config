@@ -5,6 +5,33 @@ description: "Execute an OpenProject Story through the shared development workfl
 
 # OpenProject development workflow
 
+## Autonomous implementation and approval boundary
+
+A request to implement a Story authorizes work within its defined scope through
+Story/workflow inspection and dependency verification, repository and existing
+implementation inspection, implementation, tests and required validation, fixing
+validation failures, preparing OpenProject implementation evidence, and preparing
+the proposed commit/PR summary. Proceed autonomously through these stages; do not
+request intermediate approvals or permission to make in-scope implementation
+changes. Preview/apply commands still require inspection of their previews, but
+that inspection does not itself require another user approval for authorized work.
+
+The first normal approval boundary is immediately before commit, push, or PR
+creation. Present a concise review of changes made, repositories affected,
+validation/test results (including unavailable checks), material implementation
+decisions, and proposed commit(s) and PR(s). Then stop for explicit approval before
+performing any of those actions. Approval covers the reviewed batch and its
+existing standard delivery/closure workflow; continue that workflow without
+repeating approval requests for already authorized actions.
+
+This policy does not authorize scope expansion, destructive operations unrelated
+to the Story, secret disclosure, bypassing safety controls, or actions for which
+an underlying tool/runtime explicitly requires separate approval. Missing required
+context or a material scope conflict still needs resolution; do not treat ordinary
+implementation choices as approval gates or bypass execution permissions.
+
+## Standard workflow
+
 Work from the Story's repository. Use the supported `wood` CLI; in a Wood Tools
 checkout under review, use `uv run --active --frozen wood`. Confirm the selected
 executable exposes the needed commands with `wood contract --json` once, and
@@ -29,7 +56,7 @@ do not guess flags or assume a command name proves that newer result fields exis
    `wood story get <id> --json`. Read the goal, acceptance criteria, dependencies,
    repository, and Planning Increment. Stop on ambiguity, missing context, or
    ineligible work. Decompose a Story that is too broad before implementation.
-2. Once starting that Story is authorized, preview and apply
+2. The implementation request authorizes starting the eligible Story; preview and apply
    `wood story start <id> --json`. Verify In progress and the Story branch.
    Preserve unrelated changes; use an isolated clean worktree if another Story
    has unfinished work. Do not push merely to expose a branch.
@@ -42,7 +69,8 @@ do not guess flags or assume a command name proves that newer result fields exis
    mapping IDs. Retain the verified mapping; numeric misses, duplicate names,
    conflicting relationships, and stale plans require fresh inspection. See the
    [representative workflow](../../docs/wood-delivery-workflow.md) for scope and retries.
-   Implement the Story's accepted scope. The CLI owns
+   Inspect the repository and existing implementation, then implement the Story's
+   accepted scope without intermediate approval prompts. The CLI owns
    project selection, dependency and status checks, and branch preparation.
 4. Run `wood repo validate --json` after edits. Retain its `data.validation_file`
    and log paths; the record binds passed checks to the validated file contents,
@@ -50,9 +78,14 @@ do not guess flags or assume a command name proves that newer result fields exis
    Use repository-specific checks only for an unsupported or unavailable check,
    or to diagnose a failure. Do not rerun passing checks without a relevant
    change or claim an unavailable check passed.
-5. **Stop for review.** Present the diff, validation, and remaining risks.
-   Do not commit, push, open a PR, merge, or close until the user approves
-   that reviewed batch.
+5. Prepare the OpenProject implementation evidence inputs using the saved
+   validation record/logs, changes, and material decisions; prepare proposed
+   commit(s) and PR title(s)/description(s). Final Wood-generated delivery evidence
+   still requires verified merge/CI facts and is generated in step 7; do not
+   fabricate those facts or post a completion claim during preparation.
+   **Stop for review immediately before commit/push/PR creation.** Present the
+   concise review defined above, including remaining material risks. Do not commit,
+   push, open a PR, merge, or close until the user approves that reviewed batch.
 6. After approval, commit and push the reviewed Story branch and open a PR to
    `main`. Wood Tools does not create or merge PRs; use `gh` for those operations.
    Use `wood ci status --json` for current centralized validation;
@@ -164,8 +197,9 @@ missing facts; a handoff does not upgrade pending observations to passed evidenc
 ## Planning Increment loop
 
 When the user explicitly authorizes a named Planning Increment loop, that
-authorization covers selection, start, implementation, and validation of each
-dependency-ready Story. Stop at review for each Story. Approval of one review
+authorization covers the autonomous stages above for each dependency-ready Story,
+including selection and start. Stop at the commit/push/PR approval boundary for
+each Story. Approval of one review
 authorizes delivery and closure of only that Story; after it closes, continue
 to the next eligible Story using `wood story next --json`. Reuse the previous
 closeout result until selection or the next mutation changes it; do not audit the

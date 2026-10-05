@@ -25,12 +25,3 @@ for codex_dir in "$HOME/.codex" "$HOME/.codex-secondary"; do
     link_if_absent "$skill_dir" "$codex_dir/skills/$skill_name"
   done
 done
-
-wood_tools_dir="$HOME/Projects/internal/Wood Tools/wood-tools"
-if [ -d "$wood_tools_dir/.git" ]; then
-  link_if_absent "$repo_dir/overrides/wood-tools/AGENTS.override.md" "$wood_tools_dir/AGENTS.override.md"
-  exclude_file="$wood_tools_dir/.git/info/exclude"
-  if ! grep -Fxq 'AGENTS.override.md' "$exclude_file"; then
-    printf '\nAGENTS.override.md\n' >> "$exclude_file"
-  fi
-fi
