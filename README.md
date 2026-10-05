@@ -16,13 +16,36 @@ and using a fallback for an unsupported operation.
 ## Wood Tools v2 workflow
 
 Use Wood Tools first for supported Story, repository, CI, delivery, verification,
-and hierarchy operations. The adopted surface is Wood Tools **v0.17.0 or later**;
+and hierarchy operations. The adopted surface is Wood Tools **v0.19.2 or later**;
 check the selected executable with `wood contract --json` once and retain that
-result. Inject OpenProject credentials through Infisical and use the
+result. Run plain `wood` commands and use the
 [Story workflow](skills/openproject-development-workflow/SKILL.md) for review and
 closure policy. Repositories with `[tool.wood.openproject]` context can omit the
 Initiative reference. The [representative workflow](docs/wood-delivery-workflow.md)
 includes previews, optional verification, summary repair, and hierarchy setup.
+
+Use the globally installed `wood` from the current task repository. Install or
+upgrade the released tool with:
+
+```sh
+uv tool install --force --python 3.14 --from 'git+https://github.com/SpencerRWood/wood-tools.git@v0.19.2' wood-tools
+```
+
+In a Wood Tools checkout under review, select `uv run --active --frozen wood`
+instead. Installation does not select repository context: `project_id` and
+`initiative_id` belong in the current Git root's `[tool.wood.openproject]` table
+in `pyproject.toml`. Supported explicit CLI selectors take precedence over mapped
+IDs. Agents must not use `OPENPROJECT_PROJECT_ID` or `OPENPROJECT_INITIATIVE_ID`
+as overrides or fallbacks; configure missing required mappings or supply supported
+explicit CLI selectors. These IDs are not global runtime prerequisites.
+Wood Tools v0.19.2 removes environment-ID fallback from the implementation.
+
+Only `OPENPROJECT_URL` and `OPENPROJECT_API_TOKEN` are globally required. The URL
+is non-secret global configuration; the API token stays Infisical-backed and is
+injected only into the command process. Never persist it in `.env`, `pyproject.toml`,
+configuration files, logs, diagnostics, or generated artifacts. Project discovery
+works with URL/token alone, without repository mappings.
+
 The normal flow is:
 
 ```text

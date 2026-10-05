@@ -1,11 +1,20 @@
 # Wood Tools delivery workflow
 
-Run from the Story's Primary Repository using an executable exposing the
-v0.17.0 command contract. Use `wood contract --json` once per selected executable;
-retain it when switching checkouts with that same executable. Inject credentials
-through Infisical; `--project-config-dir <directory>` points at an existing
-authorized context when the current repository has none. In a Wood Tools checkout,
+Run plain `wood` commands from the Story's Primary Repository using
+Wood Tools v0.19.2 or later. Use `wood contract --json` once per selected executable;
+retain it when switching checkouts with that same executable. In a Wood Tools checkout,
 use `uv run --active --frozen wood`. This document uses `wood` for either selection.
+
+Resolve repository `project_id` and `initiative_id` from the current Git root's
+`[tool.wood.openproject]` in `pyproject.toml`. Supported explicit CLI selectors
+override the context they select. Do not use `OPENPROJECT_PROJECT_ID` or
+`OPENPROJECT_INITIATIVE_ID` as overrides or fallbacks; configure missing required
+mappings or use supported explicit CLI selectors. Wood Tools v0.19.2 removes
+environment-ID fallback from the implementation.
+Globally require only the non-secret `OPENPROJECT_URL` and Infisical-backed
+`OPENPROJECT_API_TOKEN`. Inject the token only into the command process and never
+persist it in env files, repository configuration, logs, diagnostics, or artifacts.
+Project discovery needs URL/token alone, without a repository mapping.
 
 The [Story skill](../skills/openproject-development-workflow/SKILL.md) owns review
 and delivery policy. The executable examples below are templates: replace bracketed

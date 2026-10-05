@@ -32,19 +32,17 @@ implementation choices as approval gates or bypass execution permissions.
 
 ## Standard workflow
 
-Work from the Story's repository. Use the supported `wood` CLI; in a Wood Tools
+Work from the Story's repository. Run plain `wood` commands; in a Wood Tools
 checkout under review, use `uv run --active --frozen wood`. Confirm the selected
 executable exposes the needed commands with `wood contract --json` once, and
 reuse that capability result. Wood Tools is the first control surface for supported
 OpenProject, repository, CI, delivery, verification, and hierarchy operations.
 Consume bounded JSON and retain returned IDs, revisions, hashes, and file paths;
-do not reconstruct those facts with additional system queries. Inject credentials with
-`infisical run --env=dev --path=/openproject --`. Run Infisical-backed commands
-with network permission from their first attempt. A repository may provide
-`[tool.wood.openproject]` context; pass an Initiative reference only when needed.
-If this repository has no Infisical context, point `infisical run` at the existing
-authorized context with `--project-config-dir <directory>`; keep the child command
-in the Story repository. Never copy secret values into a checkout.
+do not reconstruct those facts with additional system queries. Run commands that
+access external services with network permission from their first attempt. A
+repository may provide `[tool.wood.openproject]` context; pass an Initiative
+reference only when needed.
+Never copy secret values into a checkout.
 
 An installed executable can lag behind the Wood Tools checkout. If its contract
 lacks a required capability, distinguish installation drift from a source capability
