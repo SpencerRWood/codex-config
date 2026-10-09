@@ -52,8 +52,10 @@ The normal flow is:
 wood doctor --json                         # readiness when uncertain
 wood story next --json
 wood story get <id> --json
-wood story start <id> --json
-wood story start <id> --apply --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --apply --json
+# continue from the returned worktree, retaining owner/path across restarts
+wood story session get <id> --json
 # inspect existing implementation, implement, validate, and fix failures autonomously
 wood repo validate --json
 # prepare implementation evidence inputs and proposed commit/PR summary
@@ -66,10 +68,13 @@ wood repo verify --json                    # when repository-owned checks apply
 # include --verification <verification-file> in both evidence calls when applicable
 wood story evidence <id> --validation <validation-file> --pr <number> --ci-run <run-id> --json
 wood story evidence <id> --validation <validation-file> --pr <number> --ci-run <run-id> --apply --json
-wood story activity add <id> --evidence <evidence-file> --json
-wood story activity add <id> --evidence <evidence-file> --apply --json
-wood story complete <id> --evidence <evidence-file> --json
-wood story complete <id> --evidence <evidence-file> --apply --json
+wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --json
+wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --apply --json
+wood story complete <id> --owner <session-owner> --evidence <evidence-file> --json
+wood story complete <id> --owner <session-owner> --evidence <evidence-file> --apply --json
+# after execution stops and evidence/handoff is retained
+wood story session release <id> --owner <session-owner> --json
+wood story session release <id> --owner <session-owner> --apply --json
 ```
 
 The Story skill defines autonomous in-scope implementation through validation fixes,

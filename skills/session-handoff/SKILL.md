@@ -7,7 +7,18 @@ description: Create a compact, verified checkpoint for continuing an active obje
 
 Create a concise checkpoint from verified work in the current session. Include these fields: Goal, Completed, Current State, Changed Files / PRs / Releases, Validation, Blockers, Next Exact Action, and References. Use `none` for empty fields and distinguish observed results from pending work. Include paths and links needed to resume, without copying transcripts, long logs, secrets, or speculative status. Target 500–800 words maximum; use less when the facts fit. Save it to a file only when the user requests an artifact; otherwise return it in the response.
 
-For an OpenProject Story, consume the latest `wood delivery status <id> --json`
+For an active claimed Story, read `wood story session get <id> --json` first to
+verify its durable owner, repository, branch/worktree, revision, dirty state and
+saved record availability. Retain the owner/path for restart in Codex or Pi; the
+previous execution must stop before another agent resumes that owner. A checkpoint
+phase and existing file path do not attest passed checks. When a saved artifact is
+requested, preview/apply `wood story session handoff <id> --json` and reuse its
+returned path rather than copying a transcript. Keep claim/worktree through delivery;
+release explicitly with the matching owner only after execution stops and the
+handoff/evidence is retained. These claims cover one local repository's worktrees,
+not independent clones or hosts. If no claim exists, report it as unavailable.
+
+For an OpenProject Story's delivery facts, consume the latest `wood delivery status <id> --json`
 result or the `delivery` snapshot from `wood story evidence`. Reuse facts already
 returned; query delivery once only if no relevant snapshot exists or a subsequent
 mutation made it stale. Record the observation time, Story and repository, branch,
