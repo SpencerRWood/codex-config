@@ -1,0 +1,4 @@
+[architecture]
+domain = "engineering"
+capability = "agent-configuration"
+kind = "configuration"
