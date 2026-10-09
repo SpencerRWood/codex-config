@@ -27,12 +27,18 @@ with `#` describe authorization or applicability boundaries.
 wood contract --json
 wood story next <initiative> --json
 wood story get <id> --json
-wood story start <id> --json
-wood story start <id> --apply --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --apply --json
+# continue from the returned isolated worktree
+wood story session get <id> --json
 wood repo info --json
 wood repo standards --json
 # inspect existing implementation and implement the packet's accepted scope autonomously
 wood repo validate --json
+wood story session checkpoint <id> --owner <session-owner> --phase review --next-action 'Review before commit/push/PR creation' --record <validation-file> --json
+wood story session checkpoint <id> --owner <session-owner> --phase review --next-action 'Review before commit/push/PR creation' --record <validation-file> --apply --json
+wood story session handoff <id> --json
+wood story session handoff <id> --apply --json
 # fix validation failures; prepare implementation evidence inputs and commit/PR summary
 # stop immediately before commit/push/PR creation for the Story skill's review
 # approval permits the reviewed batch's standard delivery and closure workflow
@@ -45,10 +51,13 @@ wood repo verify --json
 wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --json
 wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --apply --json
 # when no application verification applies, omit --verification in both calls
-wood story activity add <id> --evidence <evidence-file> --json
-wood story activity add <id> --evidence <evidence-file> --apply --json
-wood story complete <id> --evidence <evidence-file> --json
-wood story complete <id> --evidence <evidence-file> --apply --json
+wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --json
+wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --apply --json
+wood story complete <id> --owner <session-owner> --evidence <evidence-file> --json
+wood story complete <id> --owner <session-owner> --evidence <evidence-file> --apply --json
+# after execution stops and its evidence/handoff is retained
+wood story session release <id> --owner <session-owner> --json
+wood story session release <id> --owner <session-owner> --apply --json
 ```
 
 The implementation request authorizes in-scope inspection, dependency verification,
@@ -61,8 +70,15 @@ evidence after verified merge/CI. Separate tool/runtime approvals and the Story
 skill's scope/safety limits remain in force.
 
 Read the selected packet once for repository, acceptance criteria, Planning
-Increment, and dependencies. `story start` verifies eligibility and prepares the
-branch; do not separately recreate its dependency/branch logic. Keep the returned
+Increment, and dependencies. `story start` verifies eligibility, claims the Story
+for its stable owner and prepares the isolated worktree/branch; do not separately
+recreate its dependency/branch logic. Codex and Pi share the claim across that
+local repository's worktrees. Claims survive process exits and never expire; resume
+with the recorded owner/path, and never run that owner concurrently in two agents.
+Independent clones and other hosts are outside this protocol. A checkpoint/handoff
+retains paths and observations, not a passed-check attestation. Keep the worktree
+through closure, release the claim explicitly, then clean up verified merged Git
+branches/worktrees. Keep the returned
 validation record and log paths through delivery. CI must be completed and passed
 on the source or merged revision; stale latest-run results cannot substitute for it.
 
@@ -141,8 +157,8 @@ be disclosed. A Story without a Primary Repository uses `validation_summary`.
 
 ```text
 wood story activity list <id> --json
-wood story activity summary <id> --evidence <evidence-file> --expected-sha256 <observed-hash> --json
-wood story activity summary <id> --evidence <evidence-file> --expected-sha256 <observed-hash> --apply --json
+wood story activity summary <id> --owner <session-owner> --evidence <evidence-file> --expected-sha256 <observed-hash> --json
+wood story activity summary <id> --owner <session-owner> --evidence <evidence-file> --expected-sha256 <observed-hash> --apply --json
 ```
 
 Inspection distinguishes summary/progress/system activities and returns

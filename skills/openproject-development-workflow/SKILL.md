@@ -55,9 +55,30 @@ do not guess flags or assume a command name proves that newer result fields exis
    repository, and Planning Increment. Stop on ambiguity, missing context, or
    ineligible work. Decompose a Story that is too broad before implementation.
 2. The implementation request authorizes starting the eligible Story; preview and apply
-   `wood story start <id> --json`. Verify In progress and the Story branch.
-   Preserve unrelated changes; use an isolated clean worktree if another Story
-   has unfinished work. Do not push merely to expose a branch.
+   `wood story start <id> --owner <unique-session-id> --worktree <absolute-path> --json`.
+   Require the selected Wood contract to expose `story session get`, `checkpoint`,
+   `handoff` and `release`; an old installation requires an upgrade, not a direct
+   Git/OpenProject substitute. The optional `--project` and `--initiative` selectors
+   override their repository mappings. Verify In progress and the returned Story
+   branch, owner and isolated worktree; continue from that worktree. New worktrees
+   start from local `main`, preserving dirty primary-checkout changes. Inspect occupied
+   targets/branches instead of moving or overwriting another checkout. Do not push
+   merely to expose a branch.
+
+   Wood keeps the claim under Git's common metadata directory across process exits.
+   Pi and Codex share this host-local protocol for worktrees of one repository;
+   independent clones/hosts are outside its scope. Never run concurrent agents with
+   the same owner ID. Resume with the exact recorded owner/path; In progress and
+   dirty worktrees can be resumed by that owner, with live dependencies rechecked.
+   Use `wood story session get <id> --json` for credential-free recovery. Pass
+   `--owner <unique-session-id>` on status, block, complete and activity writes while
+   the claim is active. Before review/handoff, preview and apply
+   `wood story session checkpoint <id> --owner <owner> --phase review
+   --next-action <exact-action> --record <saved-validation-file> --json`; repeat
+   `--record` for other saved Wood records/logs (at most 20). Phase/file presence is
+   not validation. `wood story session handoff <id> --json` previews an observation;
+   `--apply` saves its private JSON artifact and returns the path. Keep evidence and
+   record references through delivery; claims never expire automatically.
 3. Run `wood repo info --json` and `wood repo standards --json` once to read
    the repository contract. If authorized work needs hierarchy provisioning,
    use `wood hierarchy plan --project <project> --initiative <initiative>
@@ -90,9 +111,9 @@ do not guess flags or assume a command name proves that newer result fields exis
    use `wood ci failures --json` to diagnose failures. Verify PR checks on the
    Story commit and confirm the PR merged. If deployment applies, inspect
    `wood deploy status --json`. Never treat stale, pending, failed, or
-   unavailable checks as passed. After merge, fast-forward local `main` and
-   remove the merged Story branches; force-delete a local branch only after
-   verifying a squash or rebase merge.
+   unavailable checks as passed. Keep the claimed Story worktree through evidence
+   generation, activity posting and closure; branch/worktree cleanup follows those
+   steps so recovery and evidence retain their source binding.
 7. After merge, run `wood delivery status <id> --json` once from the Story checkout.
    Reuse its `fields`, `delivery_stage`, `blocker`, and `next_action` for the delivery
    briefing. A successful envelope means reconciliation completed, not that all
@@ -129,21 +150,29 @@ do not guess flags or assume a command name proves that newer result fields exis
    PR branch, matching validated contents, all required logs, and passed validation
    CI on the source or merge revision. Use the explicit verified run ID from PR
    checks when `wood ci status` reports an unrelated latest run as stale.
-8. Post the generated update using `wood story activity add <id>
+8. Post the generated update using `wood story activity add <id> --owner <owner>
    --evidence <evidence-file> --json` (preview, then `--apply`). Verify the returned
    activity ID. To inspect or repair an existing summary, use `wood story activity
    list <id> --json` and its `summary_activity_id`, `summary_count`, and activity
    `sha256`; page with `--offset` if needed. Multiple summaries require resolution.
-   For an authorized summary update, preview `wood story activity summary <id>
+   For an authorized summary update, preview `wood story activity summary <id> --owner <owner>
    --evidence <evidence-file> --expected-sha256 <observed-hash> --json`, then apply.
    Creation uses `--expected-sha256 absent`; ordinary progress uses activity add
    with `--file` and a distinct heading. Do not overwrite unseen or changed content.
    Read the live Story, then preview and apply
-   `wood story complete <id> --evidence <evidence-file> --json`. Both consumers
+   `wood story complete <id> --owner <owner> --evidence <evidence-file> --json`. Both consumers
    reverify the generated record and current PR/CI state. Verify Closed. Keep the
    Story open if evidence cannot be posted or verified. Closure does not create
    a release. Add a separate factual activity for material release or deployment
    details and limitations that the generated update does not capture.
+
+   Once execution has stopped and the handoff/evidence is retained, preview and
+   apply `wood story session release <id> --owner <owner> --json`. Release retains
+   worktree and saved record references; it does not close the Story. After verified
+   closure, fast-forward local `main`, remove the clean merged worktree and merged
+   Story branch. Git cleanup remains a direct Git operation; Wood has no cleanup
+   capability. Force-delete a branch only after verifying a squash or rebase merge.
+   Do not remove a dirty worktree or release a running execution's claim.
 
 Generated files and logs use the current repository's `[tool.wood.workflow]`
 `output_directory` in `pyproject.toml`, defaulting to `/private/tmp`. Use returned
