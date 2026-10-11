@@ -79,9 +79,10 @@ introduced. Workflow contract tests pass; this is not a live GitHub runtime atte
 
 Pi passes all four checks: pre-commit, lint, typecheck and tests; record:
 `/private/tmp/wood-repo-validate-bkvikfng/validation.json`.
-Wood passes all six declared checks, 481 tests and 91.75% coverage (85% required);
-record: `/private/tmp/wood-repo-validate-wlrv9iaj/validation.json`. A subsequent
-focused branch/claim verification covers the current-root metadata selection fix.
+Wood passes all six declared checks, 482 tests and 91.75% coverage (85% required);
+final record: `/private/tmp/wood-repo-validate-1hzz1l9f/validation.json`, including
+the current-root metadata selection regression. A focused 38-test branch/claim
+check also passed before the final full validation.
 Shared workflows pass 110 tests with the existing pinned python-semantic-release
 10.6.2 dependency; log: `check-rs735ey8.log` in the retained evidence directory.
 Codex passes 14 maintained documentation/helper tests against the reviewed Wood
