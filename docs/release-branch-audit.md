@@ -3,7 +3,7 @@
 ## Scope and disposition
 
 Inspected global Codex/Pi policy links, codex-config Story skills and planning
-references, active internal repository AGENTS.md files and purposes, repository
+references, local internal repository AGENTS.md files and purposes, repository
 templates, `.github/release.toml`, semantic-release configuration, centralized
 `SpencerRWood/workflows` release/validation contracts and Wood Tools source.
 Changes are prepared in isolated `docs/release-branch-methodology-20261011`
@@ -59,7 +59,10 @@ metadata, not the folder name or OpenProject ownership domain.
 | Trunk-based | `synthetic-website-analytics-platform` | Cross-repository architecture/roadmap documentation; no application package. |
 | Trunk-based | `template-dbt`, `template-fastapi-react`, `template-fastapi-service`, `template-python-analytics`, `template-python-api-client`, `template-python-cli`, `template-python-dagster`, `template-python-library`, `template-synthetic-data`, `template-web-automation` | Template maintenance; created applications must be reclassified. |
 
-Total: 11 application repositories and 21 trunk repositories. `wood-agents`
+Total: 11 application repositories and 21 trunk repositories inspected. The
+simulation repository is archived on GitHub: its instruction commit is retained
+locally, but the server rejects its push as read-only. Do not unarchive it as part
+of this task. `wood-agents`
 remote fetch returns Repository not found; its local proposal is based on cached
 `origin/main`, not a verified current remote. Remote access must be restored
 before publishing that PR. No active application release was selected or created
@@ -174,7 +177,7 @@ checks. Remaining failures are recorded without bypass:
 - `wood-charts`: existing 684 KB `uv.lock` exceeds the 500 KB pre-commit large-file
   limit; log `/private/tmp/wood-repo-validate-cmphw0bc/04-pre-commit.log`.
 
-Wood Agents passes 26 scaffold tests after updating its two changed content
+Wood Agents passes 26 scaffold tests after updating its changed content
 checksums; one test still expects a missing sibling Wood Tools legacy skill
 baseline. Its remote remains unavailable. The documentation-only platform and
 simulation changes receive static classification/reference/whitespace checks;
@@ -195,3 +198,18 @@ Normal PR creation is requested; Pi repository instructions still require a
 concrete review before commit/push/PR creation. Review and delivery must preserve
 that boundary, and no prepared application migration PR should be merged as a
 side effect of preparing the policy.
+
+The [PR index](release-branch-changes.md) contains 29 normal, open, unmerged
+PRs targeting `main` for this governance rollout. Pi remains a validated local
+three-file proposal awaiting its existing review boundary. Wood Agents remains
+local pending remote access; the archived simulation's local instruction commit
+cannot be pushed. No protection, hook or archival restriction was bypassed.
+
+A single GitHub observation at `2026-10-11T11:05:29.920274+00:00` inspected all
+29 PRs and their exact governance-branch workflow runs. It found no publishing,
+release, promotion or deployment runs and no truncated run lists. The saved
+authority snapshot is `/private/tmp/release-branch-20261011/pr-observation.json`.
+This attests to that observation, not to release approval or runtime health.
+Wood's shared-workflow CI status returned `CI_EVIDENCE_UNAVAILABLE` because it
+looks for validation workflows and does not select the `test-contracts.yml`
+authority; the focused GitHub branch/PR read is the explained diagnostic fallback.

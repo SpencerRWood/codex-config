@@ -70,9 +70,11 @@ OpenProject**. Discovery must finish before creating or mutating a Story worktre
    fail closed; do not create a wrong-base claim and repair it behind Wood's back.
 6. Use an isolated worktree or separate checkout for each concurrent execution,
    with a unique owner. Never concurrently mutate one working tree or implement
-   directly on `main` or a shared integration branch. Use `feat/op-<id>-<slug>`
-   for features and `fix/op-<id>-<slug>` for fixes once supported by the tool.
-   Until then, report the naming/base capability gap rather than introducing aliases.
+   directly on `main` or a shared integration branch. Application Stories use
+   `feat/op-<id>-<slug>` for features and `fix/op-<id>-<slug>` for fixes once
+   supported by the tool. Until then, report that naming/base capability gap
+   rather than introducing aliases. Trunk repositories may retain their existing
+   supported `feature/op-*` convention; it does not change their base or PR target.
 
 Record strategy, selected base and target, fetched base revision, repository,
 Story ID, OpenProject project/version ID and release name, planned SemVer,
