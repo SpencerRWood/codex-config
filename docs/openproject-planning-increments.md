@@ -1,5 +1,11 @@
 # OpenProject Planning Increments
 
+Apply the [canonical branching policy](branching-policy.md). An R# planning
+version is not a Git release branch or a deployment. Associate the approved
+repository release scope and SemVer integration branch explicitly; prefer its
+unfinished dependency-ready Stories. Completion of those Stories makes the
+release a readiness candidate, never an automatic merge, publication or deployment.
+
 ## Ownership and hierarchy
 
 Place work in the OpenProject project that owns its outcome. Domain projects own a

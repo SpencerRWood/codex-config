@@ -23,6 +23,14 @@ with `#` describe authorization or applicability boundaries.
 
 ## Representative Story
 
+First apply the [canonical branching policy](branching-policy.md): verify strategy,
+approved release mapping, fetched base and explicit PR target. These executable
+templates apply only when the selected Wood implementation supports that base,
+branch naming and evidence lifecycle. Current limitations are recorded in the
+[audit](release-branch-audit.md); never use `story start` to fall back to `main`.
+Release/publication/deployment observations are separate from Story integration
+and confer no authority to run those operations.
+
 ```text
 wood contract --json
 wood story next <initiative> --json

@@ -1,5 +1,10 @@
 # Personal Codex configuration
 
+The canonical [branching and delivery policy](docs/branching-policy.md) governs
+both Codex profiles and Pi's shared AGENTS.md link. Read the
+[classification, audit and enforcement gaps](docs/release-branch-audit.md) before
+starting a release-branch Story with the current Wood Tools implementation.
+
 This repository is the shared source for the `codex` and `codex2` CLI profiles on this Mac. It contains global guidance, personal skills, and their supporting scripts and references. It does not contain account credentials, Codex runtime state, or the old Wood Tools `AGENTS.md`.
 
 Run `bash scripts/install.sh` after cloning to link `AGENTS.md` and every `skills/*/SKILL.md` folder into both Codex homes. The installer refuses to replace existing files or directories. Installation is limited to the Codex homes; it does not write guidance or Git configuration into a Wood Tools checkout.
@@ -52,6 +57,8 @@ The normal flow is:
 wood doctor --json                         # readiness when uncertain
 wood story next --json
 wood story get <id> --json
+# first verify strategy, release association, fetched base and PR target
+# the following start/evidence commands require a compatible base/naming contract
 wood story start <id> --owner <session-owner> --worktree <absolute-path> --json
 wood story start <id> --owner <session-owner> --worktree <absolute-path> --apply --json
 # continue from the returned worktree, retaining owner/path across restarts
@@ -63,6 +70,7 @@ wood repo validate --json
 # approval permits the reviewed batch's standard delivery and closure workflow
 wood ci status --json
 # after the approved PR merges; retain data.validation_file from repo validate
+# release/deployment observations do not authorize publication or deployment
 wood delivery status <id> --json
 wood repo verify --json                    # when repository-owned checks apply
 # include --verification <verification-file> in both evidence calls when applicable

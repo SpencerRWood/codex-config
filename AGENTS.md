@@ -1,5 +1,8 @@
 # Shared Codex Guidance
 
+- Follow the canonical [branching and delivery policy](docs/branching-policy.md) from the installed codex-config source path. Applications use approved `release/vX.Y.Z` integration branches; infrastructure, shared tooling/workflows, agent configuration and templates use short-lived branches targeting `main`. This codex-config repository is trunk-based.
+- Discover and verify the repository strategy, OpenProject release association, fetched base branch and intended PR target before implementation. Record them in Story evidence. Never fall back to `main` for an application Story; stop if the selected tool cannot honor the required base or evidence contract.
+- Story integration does not authorize release publication or deployment. Require full release validation and approval before a release PR merges into `main`; retain separate publication, deployment, rollback and safe branch-cleanup gates. Parallel agents must use isolated worktrees or separate checkouts with unique owners.
 - Prefer short, bounded execution phases over long-running sessions.
 - At logical objective, repository, or deployment boundaries, create a concise handoff and start a fresh session when practical.
 - Prefer deterministic helpers with bounded structured output over repeated exploratory commands or large raw logs.
