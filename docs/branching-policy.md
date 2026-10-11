@@ -1,7 +1,7 @@
 # Branching and delivery policy
 
-This is the canonical engineering policy for Codex and Pi. Repository AGENTS.md
-files declare their strategy and justified exceptions, and reference this document
+This is the single canonical engineering policy for Codex and Pi. Repository metadata
+declares an adopted strategy and justified exceptions; instruction files reference this document
 at `SpencerRWood/codex-config/docs/branching-policy.md`. Read it through the explicit
 codex-config source path used by the installed global AGENTS.md; do not resolve
 relative links against a Codex home. Preserve repository review, security, CI,
@@ -9,7 +9,7 @@ immutable artifact, rollback and approval requirements in addition to these gate
 
 ## Repository strategy
 
-Application repositories use **release-branch integration**:
+Application repositories progressively adopt **release-branch integration**:
 
 ```text
 main
@@ -35,9 +35,34 @@ explicit coordinated-change exception in these repositories.
 
 Inspect purpose, repository metadata and existing conventions when classification
 is unclear; a directory name or the presence of semantic-release is insufficient.
-The [classification record](release-branch-audit.md) records the inspected fleet.
-Templates themselves use trunk-based development. When instantiating a template,
-replace its template-repository classification before application work starts.
+The [classification record](release-branch-audit.md) records the inspected fleet;
+classification is not evidence of adoption. Templates themselves remain trunk-based.
+
+## Progressive adoption and rollout scope
+
+The active rollout is limited to codex-config, pi-config, wood-tools and workflows.
+Do not edit application, infrastructure or template AGENTS.md files as a fleet migration.
+Repository-specific references or configuration changes require a specific adoption task.
+Nonadopters continue their existing conventions without blocking unrelated development.
+An existing in-progress Story may finish its existing branch arrangement when safe
+and explicitly approved; record that approval and retain its worktree and implementation.
+
+New application Stories adopt release integration only after the approved release
+scope, explicit OpenProject-to-Git mapping, compatible Wood executable and validation
+callers are available. Record adoption in `[tool.wood.branching]` with
+`strategy = "release"`, `release_id`, `release_branch` and `scope_reference`.
+The release ID is the OpenProject planning version ID; the scope reference identifies
+the actual approval, not an approval inferred from a branch name. Wood verifies an
+open matching release and an existing remote branch; it never creates a release branch.
+An absent branching section preserves existing trunk behavior; it does not certify an
+application's purpose or authorize migration. Use `strategy = "trunk"` where explicit
+metadata is useful. Once release strategy is adopted, missing gates fail closed.
+
+Recovery Verification R1 is the first controlled application adoption after the
+foundation is ready. Preserve OP-499's implementation, claim and worktree. A fixture
+validation of this scenario does not approve a SemVer, create a live branch, migrate
+OP-499 or authorize a release. Deferred caller trigger and publication controls must
+be resolved at that adoption boundary. See the [rollout index](release-branch-changes.md).
 
 ## Discover before implementation
 
@@ -52,7 +77,7 @@ OpenProject**. Discovery must finish before creating or mutating a Story worktre
    with `--json`. Prefer unfinished, dependency-ready Stories in the active scope
    over later releases. Verify selection returned by `wood story next`; its
    Planning Increment order alone does not select a Git integration branch.
-3. Fetch origin and inspect remote branches. For applications, verify the exact
+3. Fetch origin and inspect remote branches. For adopted applications, verify the exact
    `release/vX.Y.Z` branch against the approved release association, scope,
    lifecycle status and current remote revision. Multiple candidates, a closed
    or stale scope, or a missing association require resolution, never a guess.
@@ -62,18 +87,19 @@ OpenProject**. Discovery must finish before creating or mutating a Story worktre
    If no branch exists, check whether a release is approved. Create its branch
    from verified current `main` only when existing conventions or an explicit
    release instruction authorizes creation. Otherwise report the missing gate.
-   **Never silently fall back to `main` for an application Story.**
-5. Confirm the base and PR target before implementation. For applications both
+   **Never silently fall back to `main` for an adopted release-strategy Story.**
+5. Confirm the base and PR target before implementation. For adopted applications both
    are the verified release branch; for trunk repositories both are current
-   `main`. Verify the selected Wood executable can honor that base, naming and
+   `main`. Confirm supported `story start --base-branch` and `--target-branch`
+   selectors and inspect the returned branching plan. Verify the selected Wood executable can honor that base, naming and
    evidence contract before applying `story start`. Unsupported tooling must
    fail closed; do not create a wrong-base claim and repair it behind Wood's back.
 6. Use an isolated worktree or separate checkout for each concurrent execution,
    with a unique owner. Never concurrently mutate one working tree or implement
-   directly on `main` or a shared integration branch. Application Stories use
-   `feat/op-<id>-<slug>` for features and `fix/op-<id>-<slug>` for fixes once
-   supported by the tool. Until then, report that naming/base capability gap
-   rather than introducing aliases. Trunk repositories may retain their existing
+   directly on `main` or a shared integration branch. Adopted application Stories use
+   `feat/op-<id>-<slug>` for features and `fix/op-<id>-<slug>` for fixes using
+   `--branch-prefix feat` or `fix`. Existing `feature/op-*` branches are also supported.
+   Trunk repositories may retain their existing
    supported `feature/op-*` convention; it does not change their base or PR target.
 
 Record strategy, selected base and target, fetched base revision, repository,

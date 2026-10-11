@@ -35,8 +35,10 @@ implementation choices as approval gates or bypass execution permissions.
 Follow the [canonical branching and delivery policy](../../docs/branching-policy.md).
 The sequence is Discover → Branch → Implement → Validate → Review → PR → Merge →
 Update OpenProject. Read the repository strategy and verify the approved release
-association, fetched base and PR target before starting. Application Stories target
-the active `release/vX.Y.Z`; trunk repositories target `main`. Record these facts
+association, fetched base and PR target before starting. Adopted application Stories target
+the active `release/vX.Y.Z`; trunk repositories target `main`. Nonadopters continue
+existing conventions; existing work needs explicit approval to finish its safe current
+arrangement. Do not migrate repositories while executing an unrelated Story. Record these facts
 and the release identifier in implementation evidence. Tool commands below are
 conditional on support for that strategy and naming, never permission to use a
 wrong base. The [audit](../../docs/release-branch-audit.md) records current gaps.
@@ -71,8 +73,12 @@ do not guess flags or assume a command name proves that newer result fields exis
    override their repository mappings. Verify In progress and the returned Story
    branch, owner and isolated worktree; continue from that worktree. New worktrees
    must start from the verified strategy-specific base, preserving dirty primary-checkout changes.
-   The current tool starts from local `main`; do not apply it for an application
-   Story until base selection and claims support the intended release branch. Inspect occupied
+   Inspect `wood repo branching --json`; adopted release repositories require an
+   approved `[tool.wood.branching]` mapping. Confirm `--base-branch` and
+   `--target-branch` on start, and `--branch-prefix feat`, `fix` or `feature` as appropriate.
+   Release starts fetch and validate the mapped remote branch and live OpenProject
+   release; no release branch is created. Old installations that cannot honor this
+   contract must be upgraded before adopted release work starts. Inspect occupied
    targets/branches instead of moving or overwriting another checkout. Do not push
    merely to expose a branch.
 
@@ -164,11 +170,11 @@ do not guess flags or assume a command name proves that newer result fields exis
    on both calls. Retain `data.evidence_file`, `data.update_file`, and the returned
    deterministic `delivery` snapshot; keep that evidence separate from narrative.
    The command
-   requires a clean checkout containing the merge, a standard `feature/op-<id>-`
-   PR branch under the current implementation, matching validated contents, all required logs, and passed validation
-   CI on the source or merge revision. Current generated evidence also requires
-   a merge into `main`; application release-branch PRs and `feat/` or `fix/`
-   naming are unsupported. Do not redirect the PR or claim generated evidence.
+   requires a clean checkout containing the merge, a `feature/op-<id>-`, `feat/op-<id>-`
+   or `fix/op-<id>-` PR branch, matching validated contents, all required logs, and passed validation
+   CI on the source or merge revision. Pass `--target-branch` when confirming the
+   actual integration branch; generated evidence verifies it against adopted metadata
+   and records the release association. Story closure requires no publication or deployment.
    Use the documented unsupported-workflow evidence path only after independently
    verifying the designated merge/CI and confirming lifecycle consumers accept it;
    otherwise retain the claim and report the blocker. Use the explicit verified run ID from PR

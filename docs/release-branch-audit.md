@@ -1,5 +1,10 @@
 # Release-branch governance audit — 2026-10-11
 
+> Historical fleet audit retained intact below. The rollout was subsequently reduced
+> to codex-config, pi-config, wood-tools and workflows. Fleet classifications and
+> proposals below do not activate adoption or block nonadopters. See
+> [current dispositions and foundational validation](release-branch-changes.md).
+
 ## Scope and disposition
 
 Inspected global Codex/Pi policy links, codex-config Story skills and planning

@@ -2,8 +2,9 @@
 
 The canonical [branching and delivery policy](docs/branching-policy.md) governs
 both Codex profiles and Pi's shared AGENTS.md link. Read the
-[classification, audit and enforcement gaps](docs/release-branch-audit.md) before
-starting a release-branch Story with the current Wood Tools implementation.
+[progressive adoption and foundational validation](docs/release-branch-foundation.md)
+before starting an adopted release-branch Story. Nonadopters continue their existing
+conventions; this rollout is limited to four foundational repositories.
 
 This repository is the shared source for the `codex` and `codex2` CLI profiles on this Mac. It contains global guidance, personal skills, and their supporting scripts and references. It does not contain account credentials, Codex runtime state, or the old Wood Tools `AGENTS.md`.
 
