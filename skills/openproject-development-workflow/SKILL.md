@@ -32,6 +32,17 @@ implementation choices as approval gates or bypass execution permissions.
 
 ## Standard workflow
 
+Follow the [canonical branching and delivery policy](../../docs/branching-policy.md).
+The sequence is Discover → Branch → Implement → Validate → Review → PR → Merge →
+Update OpenProject. Read the repository strategy and verify the approved release
+association, fetched base and PR target before starting. Adopted application Stories target
+the active `release/vX.Y.Z`; trunk repositories target `main`. Nonadopters continue
+existing conventions; existing work needs explicit approval to finish its safe current
+arrangement. Do not migrate repositories while executing an unrelated Story. Record these facts
+and the release identifier in implementation evidence. Tool commands below are
+conditional on support for that strategy and naming, never permission to use a
+wrong base. The [audit](../../docs/release-branch-audit.md) records current gaps.
+
 Work from the Story's repository. Run plain `wood` commands; in a Wood Tools
 checkout under review, use `uv run --active --frozen wood`. Confirm the selected
 executable exposes the needed commands with `wood contract --json` once, and
@@ -61,7 +72,13 @@ do not guess flags or assume a command name proves that newer result fields exis
    Git/OpenProject substitute. The optional `--project` and `--initiative` selectors
    override their repository mappings. Verify In progress and the returned Story
    branch, owner and isolated worktree; continue from that worktree. New worktrees
-   start from local `main`, preserving dirty primary-checkout changes. Inspect occupied
+   must start from the verified strategy-specific base, preserving dirty primary-checkout changes.
+   Inspect `wood repo branching --json`; adopted release repositories require an
+   approved `[tool.wood.branching]` mapping. Confirm `--base-branch` and
+   `--target-branch` on start, and `--branch-prefix feat`, `fix` or `feature` as appropriate.
+   Release starts fetch and validate the mapped remote branch and live OpenProject
+   release; no release branch is created. Old installations that cannot honor this
+   contract must be upgraded before adopted release work starts. Inspect occupied
    targets/branches instead of moving or overwriting another checkout. Do not push
    merely to expose a branch.
 
@@ -106,11 +123,15 @@ do not guess flags or assume a command name proves that newer result fields exis
    concise review defined above, including remaining material risks. Do not commit,
    push, open a PR, merge, or close until the user approves that reviewed batch.
 6. After approval, commit and push the reviewed Story branch and open a PR to
-   `main`. Wood Tools does not create or merge PRs; use `gh` for those operations.
+   the verified designated target: the active release branch for applications,
+   `main` for trunk repositories. Wood Tools does not create or merge PRs; use
+   `gh` for those operations, specifying the base explicitly.
    Use `wood ci status --json` for current centralized validation;
    use `wood ci failures --json` to diagnose failures. Verify PR checks on the
-   Story commit and confirm the PR merged. If deployment applies, inspect
-   `wood deploy status --json`. Never treat stale, pending, failed, or
+   Story commit and confirm the PR merged into that target. Ordinary Story
+   completion does not publish images/packages, create release tags/GitHub Releases
+   or deploy, including infrastructure dev. Retain separate release/deployment
+   observations when applicable; do not trigger those stages. Never treat stale, pending, failed, or
    unavailable checks as passed. Keep the claimed Story worktree through evidence
    generation, activity posting and closure; branch/worktree cleanup follows those
    steps so recovery and evidence retain their source binding.
@@ -118,7 +139,10 @@ do not guess flags or assume a command name proves that newer result fields exis
    Reuse its `fields`, `delivery_stage`, `blocker`, and `next_action` for the delivery
    briefing. A successful envelope means reconciliation completed, not that all
    stages passed. `not_applicable` is distinct from `unavailable`, `failed`, or
-   pending delivery. Resolve applicable blockers before claiming delivery; refresh
+   pending delivery. Resolve Story integration blockers before claiming Story
+   completion. Release/publication/deployment fields have separate gates: an
+   unavailable release is not permission to publish or a reason to wait for
+   deployment before recording verified Story integration. Refresh
    only after a relevant state change. Retain `observed_at`, the verified
    `fields.merged_revision`, and `fields.release_run` with its run ID, attempt,
    revision, conclusion, and authority link. `release_jobs` carries bounded
@@ -146,9 +170,14 @@ do not guess flags or assume a command name proves that newer result fields exis
    on both calls. Retain `data.evidence_file`, `data.update_file`, and the returned
    deterministic `delivery` snapshot; keep that evidence separate from narrative.
    The command
-   requires a clean checkout containing the merge, a standard `feature/op-<id>-`
-   PR branch, matching validated contents, all required logs, and passed validation
-   CI on the source or merge revision. Use the explicit verified run ID from PR
+   requires a clean checkout containing the merge, a `feature/op-<id>-`, `feat/op-<id>-`
+   or `fix/op-<id>-` PR branch, matching validated contents, all required logs, and passed validation
+   CI on the source or merge revision. Pass `--target-branch` when confirming the
+   actual integration branch; generated evidence verifies it against adopted metadata
+   and records the release association. Story closure requires no publication or deployment.
+   Use the documented unsupported-workflow evidence path only after independently
+   verifying the designated merge/CI and confirming lifecycle consumers accept it;
+   otherwise retain the claim and report the blocker. Use the explicit verified run ID from PR
    checks when `wood ci status` reports an unrelated latest run as stale.
 8. Post the generated update using `wood story activity add <id> --owner <owner>
    --evidence <evidence-file> --json` (preview, then `--apply`). Verify the returned
@@ -169,8 +198,10 @@ do not guess flags or assume a command name proves that newer result fields exis
    Once execution has stopped and the handoff/evidence is retained, preview and
    apply `wood story session release <id> --owner <owner> --json`. Release retains
    worktree and saved record references; it does not close the Story. After verified
-   closure, fast-forward local `main`, remove the clean merged worktree and merged
-   Story branch. Git cleanup remains a direct Git operation; Wood has no cleanup
+   closure, update the designated integration target in an appropriate checkout;
+   do not move `main` for an application Story. Remove a clean merged worktree and
+   Story branch only after verifying integration, dependency and recovery needs
+   under the canonical cleanup gate. Git cleanup remains a direct Git operation; Wood has no cleanup
    capability. Force-delete a branch only after verifying a squash or rebase merge.
    Do not remove a dirty worktree or release a running execution's claim.
 

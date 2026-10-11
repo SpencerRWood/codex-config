@@ -1,5 +1,11 @@
 # OpenProject Planning Increments
 
+Apply the [canonical branching policy](branching-policy.md). An R# planning
+version is not a Git release branch or a deployment. For an adopted application, associate the approved
+repository release scope and SemVer integration branch explicitly; prefer its
+unfinished dependency-ready Stories. Completion of those Stories makes the
+release a readiness candidate, never an automatic merge, publication or deployment.
+
 ## Ownership and hierarchy
 
 Place work in the OpenProject project that owns its outcome. Domain projects own a
@@ -25,11 +31,14 @@ Story's actual repository semantic-release version is known, enter that version
 without changing its Planning Increment. A GitHub Release is the published
 repository artifact record, separate from both fields.
 
-`wood story next --json` uses repository context when available and scans active R# Planning Increments
-in numeric order and selects a Story whose predecessors are closed. A Planning Increment is
-complete when all included Stories are closed and shipped Stories have release
-traceability where practical. Completion does not require a single repository
-version or GitHub Release for the whole increment.
+`wood story next --json` uses the adopted release mapping when configured, otherwise
+scans active R# Planning Increments in numeric order, and selects a dependency-ready
+Story. When all included Stories are complete or explicitly deferred, the increment
+is a candidate for readiness validation. Reconcile approved scope, implementation
+evidence and applicable integrated release checks before explicit release closure;
+never close it merely because individual Stories closed. Retain shipped release
+traceability where practical. An increment need not have one repository version or
+one GitHub Release; publication and deployment retain separate gates.
 
 ## Current command path
 

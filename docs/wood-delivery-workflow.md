@@ -23,12 +23,24 @@ with `#` describe authorization or applicability boundaries.
 
 ## Representative Story
 
+First apply the [canonical branching policy](branching-policy.md): verify strategy,
+approved release mapping, fetched base and explicit PR target. These executable
+templates apply only when the selected Wood implementation supports that base,
+branch naming and evidence lifecycle. Inspect `wood repo branching --json` and
+confirm `story start --base-branch` / `--target-branch`; release mappings and scope
+references are opt-in repository metadata. Nonadopters retain their existing workflow.
+The [audit](release-branch-audit.md) retains historical limitations and current findings;
+never use `story start` to fall back to `main` in an adopted release repository.
+Release/publication/deployment observations are separate from Story integration
+and confer no authority to run those operations.
+
 ```text
 wood contract --json
 wood story next <initiative> --json
 wood story get <id> --json
-wood story start <id> --owner <session-owner> --worktree <absolute-path> --json
-wood story start <id> --owner <session-owner> --worktree <absolute-path> --apply --json
+wood repo branching --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --base-branch <base-branch> --target-branch <target-branch> --json
+wood story start <id> --owner <session-owner> --worktree <absolute-path> --base-branch <base-branch> --target-branch <target-branch> --apply --json
 # continue from the returned isolated worktree
 wood story session get <id> --json
 wood repo info --json
@@ -48,8 +60,8 @@ wood delivery status <id> --pr <number> --json
 # only when repository-owned verification applies and its contract is declared
 wood repo verify --json
 # reuse validation_file and applicable verification_file, without rerunning checks
-wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --json
-wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --apply --json
+wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --target-branch <target-branch> --json
+wood story evidence <id> --validation <validation-file> --verification <verification-file> --pr <number> --ci-run <run-id> --target-branch <target-branch> --apply --json
 # when no application verification applies, omit --verification in both calls
 wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --json
 wood story activity add <id> --owner <session-owner> --evidence <evidence-file> --apply --json
