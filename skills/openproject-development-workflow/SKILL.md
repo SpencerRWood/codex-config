@@ -35,8 +35,12 @@ implementation choices as approval gates or bypass execution permissions.
 Follow the [canonical branching and delivery policy](../../docs/branching-policy.md).
 The sequence is Discover → Branch → Implement → Validate → Review → PR → Merge →
 Update OpenProject. Read the repository strategy and verify the approved release
-association, fetched base and PR target before starting. Adopted application Stories target
-the active `release/vX.Y.Z`; trunk repositories target `main`. Nonadopters continue
+association, fetched base and PR target before starting. Read root
+`[tool.wood.branching]`: every repository's target lifecycle is working branch →
+development → protected main → automatic pinned repository release workflow.
+Repository type selects outputs, never strategy. Integration Stories target the configured integration
+branch (normally `development`), existing release Stories target the mapped
+`release/vX.Y.Z`, and trunk Stories target `main`. Nonadopters continue
 existing conventions; existing work needs explicit approval to finish its safe current
 arrangement. Do not migrate repositories while executing an unrelated Story. Record these facts
 and the release identifier in implementation evidence. Tool commands below are
@@ -73,14 +77,29 @@ do not guess flags or assume a command name proves that newer result fields exis
    override their repository mappings. Verify In progress and the returned Story
    branch, owner and isolated worktree; continue from that worktree. New worktrees
    must start from the verified strategy-specific base, preserving dirty primary-checkout changes.
-   Inspect `wood repo branching --json`; adopted release repositories require an
+   Negotiate `wood contract --json` branching version 1 with trunk/release/integration
+   and feature/feat/fix support before activation; session capabilities alone are
+   insufficient. Inspect `wood repo branching --json`; adopted nontrunk repositories require an
    approved `[tool.wood.branching]` mapping. Confirm `--base-branch` and
    `--target-branch` on start, and `--branch-prefix feat`, `fix` or `feature` as appropriate.
-   Release starts fetch and validate the mapped remote branch and live OpenProject
+   Nontrunk starts fetch and validate the mapped remote branch and live OpenProject
    release; no release branch is created. Old installations that cannot honor this
-   contract must be upgraded before adopted release work starts. Inspect occupied
+   contract must be upgraded before adopted work starts. Validate the preview's
+   strategy, base/target, release/scope, resolved revision, branch and worktree
+   before apply; missing or mismatched data blocks activation. Never rewrite a
+   live claim during planning-scope rollover. Inspect occupied
    targets/branches instead of moving or overwriting another checkout. Do not push
    merely to expose a branch.
+
+   Emergency hotfix is an explicit incident exception, never a migration or default.
+   Only in an adopted integration repository, pass both `--hotfix-incident` and
+   `--hotfix-approval` evidence references to start; verify hotfix mode, fetched main
+   base, main PR target, original integration branch and supported prefix before apply.
+   Keep the same references on resume, evidence and delivery queries. Require
+   protected-main approval and CI; no direct push or protection bypass. Reconcile
+   main back into development through a reviewed PR and require a passing,
+   current `wood repo release-readiness --json` record before later release
+   preparation. Record incident, approval, merge/reconciliation PRs and revisions.
 
    Wood keeps the claim under Git's common metadata directory across process exits.
    Pi and Codex share this host-local protocol for worktrees of one repository;
@@ -123,7 +142,7 @@ do not guess flags or assume a command name proves that newer result fields exis
    concise review defined above, including remaining material risks. Do not commit,
    push, open a PR, merge, or close until the user approves that reviewed batch.
 6. After approval, commit and push the reviewed Story branch and open a PR to
-   the verified designated target: the active release branch for applications,
+   the verified designated target: the configured integration/release branch,
    `main` for trunk repositories. Wood Tools does not create or merge PRs; use
    `gh` for those operations, specifying the base explicitly.
    Use `wood ci status --json` for current centralized validation;
@@ -199,7 +218,7 @@ do not guess flags or assume a command name proves that newer result fields exis
    apply `wood story session release <id> --owner <owner> --json`. Release retains
    worktree and saved record references; it does not close the Story. After verified
    closure, update the designated integration target in an appropriate checkout;
-   do not move `main` for an application Story. Remove a clean merged worktree and
+   do not move `main` for an integration Story. Remove a clean merged worktree and
    Story branch only after verifying integration, dependency and recovery needs
    under the canonical cleanup gate. Git cleanup remains a direct Git operation; Wood has no cleanup
    capability. Force-delete a branch only after verifying a squash or rebase merge.
