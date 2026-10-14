@@ -27,10 +27,12 @@ First apply the [canonical branching policy](branching-policy.md): verify strate
 approved release mapping, fetched base and explicit PR target. These executable
 templates apply only when the selected Wood implementation supports that base,
 branch naming and evidence lifecycle. Inspect `wood repo branching --json` and
-confirm `story start --base-branch` / `--target-branch`; release mappings and scope
+require branching contract version 1 and confirm the start preview's
+strategy/base/target/scope/revision before activation. Confirm
+`story start --base-branch` / `--target-branch`; integration/release mappings and scope
 references are opt-in repository metadata. Nonadopters retain their existing workflow.
 The [audit](release-branch-audit.md) retains historical limitations and current findings;
-never use `story start` to fall back to `main` in an adopted release repository.
+never use `story start` to fall back to `main` in an adopted nontrunk repository.
 Release/publication/deployment observations are separate from Story integration
 and confer no authority to run those operations.
 

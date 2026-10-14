@@ -9,57 +9,82 @@ immutable artifact, rollback and approval requirements in addition to these gate
 
 ## Repository strategy
 
-Application repositories progressively adopt **release-branch integration**:
+All active repositories progressively adopt the same **configuration-driven integration**:
 
 ```text
-main
- └── release/vX.Y.Z
-      ├── feat/op-123-description
-      ├── feat/op-124-description
-      └── fix/op-125-description
+working branch → development → protected main → automatic pinned release workflow
 ```
 
-`main` is stable and releasable. An approved, bounded release scope has one
-short-lived `release/vX.Y.Z` integration branch. Each Story is implemented and
-validated on its own branch created from that release branch. Story PRs target
-the release branch and merge only after review and required checks. Validate the
-accumulated integration branch after merges. Keep `main` unchanged until the
-release readiness gate passes. Never use a permanent `develop` branch.
+This target applies to applications, CLI tools, libraries, infrastructure,
+templates, shared workflows and agent configuration. Repository purpose determines
+publication outputs, not branching strategy. Do not infer strategy from type/name.
 
-Infrastructure, shared tooling/workflows, agent configuration, repository
-templates and configuration-only repositories use **trunk-based development**:
-create a short-lived Story/change branch from current `main`, validate it, then
-review and merge its PR into `main`. Normal Story completion does not authorize
-artifact publication or deployment. Release integration branches require an
-explicit coordinated-change exception in these repositories.
+`main` is stable and releasable. Adopted Stories start from the fetched,
+explicitly configured integration branch, normally `development`, and target that
+same branch. Validate each Story and the accumulated integration branch. Keep main
+unchanged until the separately approved release integration gate passes. Branch
+names do not select a strategy: root `pyproject.toml` does.
 
-Inspect purpose, repository metadata and existing conventions when classification
-is unclear; a directory name or the presence of semantic-release is insufficient.
-The [classification record](release-branch-audit.md) records the inspected fleet;
-classification is not evidence of adoption. Templates themselves remain trunk-based.
+| Declared strategy | Story base and PR target | Scope |
+| --- | --- | --- |
+| `integration` | Configured `integration_branch`, normally `development` | Open planning release and approved scope |
+| `release` | Configured `release_branch`, `release/vX.Y.Z` | Existing approved bounded release scope |
+| `trunk` or absent section | `main` | Existing trunk behavior; absence is not application adoption |
+
+Existing approved release mappings remain supported. Do not rename or migrate
+their branches/claims while executing unrelated work. A later change from release
+to integration requires an explicit adoption scope and safe release boundary.
+
+Existing declared trunk, undeclared trunk defaults, and bounded release strategies
+remain compatible until deliberately migrated. They are transitional behavior,
+not permanent exceptions based on repository purpose. The historical
+[classification record](release-branch-audit.md) is evidence of the inspected fleet,
+not the current architectural decision or permission to migrate it.
 
 ## Progressive adoption and rollout scope
 
-The active rollout is limited to codex-config, pi-config, wood-tools and workflows.
+BR-01 code/policy changes are limited to wood-tools, codex-config and pi-config.
+No repository's adopted strategy, live branch arrangement, publishing workflow
+or GitHub enforcement is migrated by BR-01.
 Do not edit application, infrastructure or template AGENTS.md files as a fleet migration.
 Repository-specific references or configuration changes require a specific adoption task.
 Nonadopters continue their existing conventions without blocking unrelated development.
 An existing in-progress Story may finish its existing branch arrangement when safe
 and explicitly approved; record that approval and retain its worktree and implementation.
 
-New application Stories adopt release integration only after the approved release
+Repositories adopt integration only after the approved release
 scope, explicit OpenProject-to-Git mapping, compatible Wood executable and validation
 callers are available. Record adoption in `[tool.wood.branching]` with
-`strategy = "release"`, `release_id`, `release_branch` and `scope_reference`.
+`strategy = "integration"`, `release_id`, `integration_branch` and `scope_reference`.
+Existing `strategy = "release"` uses `release_branch` instead. For example:
+
+```toml
+[tool.wood.branching]
+strategy = "integration"
+release_id = 123 # actual approved OpenProject planning version ID
+integration_branch = "development"
+scope_reference = "<actual scope approval reference>"
+```
 The release ID is the OpenProject planning version ID; the scope reference identifies
 the actual approval, not an approval inferred from a branch name. Wood verifies an
-open matching release and an existing remote branch; it never creates a release branch.
-An absent branching section preserves existing trunk behavior; it does not certify an
-application's purpose or authorize migration. Use `strategy = "trunk"` where explicit
-metadata is useful. Once release strategy is adopted, missing gates fail closed.
+open matching release and an existing remote branch; it never creates an integration branch.
+An absent branching section preserves existing trunk behavior; it does not certify a
+repository's purpose or authorize migration. Use `strategy = "trunk"` where explicit
+metadata is useful. Both adopted nontrunk strategies fail closed on missing gates.
 
-Recovery Verification R1 is the first controlled application adoption after the
-foundation is ready. Preserve OP-499's implementation, claim and worktree. A fixture
+An approved planning-scope rollover may retain the long-lived development branch.
+Finish or explicitly resolve old-scope Stories, retain their evidence, and release
+claims only after execution stops. Do not close a planning release while its active
+Stories still require it. Approve the next open version and scope, then review the
+root mapping update as a separate change. A closed planning version or changed
+mapping blocks start/resume without deleting claims or unfinished work. Resolve
+the planning conflict before resuming with the recorded owner/worktree; never
+rewrite a live claim to bypass it. Rollover grants no publication/deployment authority.
+
+Wood Design System is the approved development pilot; reference existing Stories
+547 and 551 without duplicating their scope or claims. Recovery Verification retains
+its approved release mapping until a separately authorized transition boundary.
+Preserve existing implementations, claims and worktrees. A fixture
 validation of this scenario does not approve a SemVer, create a live branch, migrate
 OP-499 or authorize a release. Deferred caller trigger and publication controls must
 be resolved at that adoption boundary. See the [rollout index](release-branch-changes.md).
@@ -77,8 +102,8 @@ OpenProject**. Discovery must finish before creating or mutating a Story worktre
    with `--json`. Prefer unfinished, dependency-ready Stories in the active scope
    over later releases. Verify selection returned by `wood story next`; its
    Planning Increment order alone does not select a Git integration branch.
-3. Fetch origin and inspect remote branches. For adopted applications, verify the exact
-   `release/vX.Y.Z` branch against the approved release association, scope,
+3. Fetch origin and inspect remote branches. For adopted repositories, verify the exact
+   configured integration or release branch against the approved release association, scope,
    lifecycle status and current remote revision. Multiple candidates, a closed
    or stale scope, or a missing association require resolution, never a guess.
 4. OpenProject `R#` Planning Increments and repository SemVer remain distinct.
@@ -87,18 +112,21 @@ OpenProject**. Discovery must finish before creating or mutating a Story worktre
    If no branch exists, check whether a release is approved. Create its branch
    from verified current `main` only when existing conventions or an explicit
    release instruction authorizes creation. Otherwise report the missing gate.
-   **Never silently fall back to `main` for an adopted release-strategy Story.**
-5. Confirm the base and PR target before implementation. For adopted applications both
-   are the verified release branch; for trunk repositories both are current
-   `main`. Confirm supported `story start --base-branch` and `--target-branch`
-   selectors and inspect the returned branching plan. Verify the selected Wood executable can honor that base, naming and
-   evidence contract before applying `story start`. Unsupported tooling must
+   **Never silently fall back to `main` for an adopted integration/release Story.**
+5. Confirm the base and PR target before implementation. For adopted repositories both
+   are the configured integration/release branch; for trunk repositories both are current
+   `main`. Read `wood contract --json` once: require branching contract version 1
+   with all three strategies and feature/feat/fix prefixes, then read
+   `wood repo branching --json`. Confirm supported `story start --base-branch`
+   and `--target-branch` selectors. Inspect the preview's strategy, base/target,
+   scope, resolved revision, branch, owner and worktree before applying start.
+   Discovery's observed local revision is not live remote verification. Unsupported tooling must
    fail closed; do not create a wrong-base claim and repair it behind Wood's back.
 6. Use an isolated worktree or separate checkout for each concurrent execution,
    with a unique owner. Never concurrently mutate one working tree or implement
-   directly on `main` or a shared integration branch. Adopted application Stories use
-   `feat/op-<id>-<slug>` for features and `fix/op-<id>-<slug>` for fixes using
-   `--branch-prefix feat` or `fix`. Existing `feature/op-*` branches are also supported.
+   directly on `main` or a shared integration branch. Adopted Stories use
+   `feature/op-<id>-<slug>` by default for integration and `feat/op-*` for release;
+   `feature`, `feat` and `fix` are supported prefixes using `--branch-prefix`.
    Trunk repositories may retain their existing
    supported `feature/op-*` convention; it does not change their base or PR target.
 
@@ -135,7 +163,18 @@ required Story completes, report a **candidate for release readiness validation*
 
 ## Release readiness and approval
 
-Open a release PR from `release/vX.Y.Z` into `main` after establishing:
+Run `wood repo release-readiness --json` for adopted integration repositories
+before preparing the development → main release PR and again after relevant
+remote changes. It fetches exact main/integration refs, requires complete history,
+and blocks with exit 3 if main is not an ancestor of integration. Retain its
+revision-bound `readiness_file`. This conservatively requires all main-only
+commits, including emergency fixes and release metadata, to be back-integrated.
+Equivalent cherry-picks alone do not satisfy this ancestry gate. Missing branch,
+incomplete history or unavailable evidence fails closed. This is a local gate;
+required GitHub CI wiring belongs to BR-02/BR-03, not an enforcement claim here.
+
+Open a release PR from the configured integration branch (`development` or the
+existing approved `release/vX.Y.Z`) into `main` after establishing:
 
 - All required Stories are complete or explicitly deferred with approval.
 - The integration branch contains the approved scope, with no unrelated work.
@@ -154,13 +193,49 @@ GitHub Release. Reconcile a dry-run version mismatch before release approval.
 
 ## Publication and deployment gates
 
-After the approved release merge, run the configured semantic-release process
-from `main`, generate the actual version and immutable artifacts, publish required
-images/packages, then deploy to infrastructure dev for release integration
-verification. Verify deployed revision/digest, runtime health and rollback
-readiness. Promote to production only with explicit authorization when applicable.
-Trunk repositories still require separate publication/deployment authorization;
-a normal merge is not that authorization.
+After explicit approval and successful validation of the protected development →
+main release integration, main triggers the repository's pinned release workflow
+automatically. That reviewed integration is distinct from ordinary Story approval.
+Outputs are repository-specific: packages, images, configuration releases or other
+declared artifacts. Semantic-release owns version calculation where configured;
+planning R# identifiers are never SemVer. Publication outputs and workflow changes
+are outside BR-01. Deployment/promotion remains subject to its own approved
+repository lifecycle, immutable artifact, runtime-health and rollback gates.
+Existing automatic publishers do not make a legacy Story merge authorized to
+publish; inspect and resolve those side effects before delivery.
+
+## Authorized emergency hotfix
+
+Normal work always uses the declared integration path. For an urgent production
+incident in an adopted integration repository, explicitly select the existing
+Story and supply both `--hotfix-incident <incident-or-emergency-justification>` and
+`--hotfix-approval <authorization-evidence-reference>` to `wood story start`.
+Wood verifies repository identity, open matching planning scope and supported
+prefix, fetches main, and creates only the isolated working branch from main.
+The returned plan records mode `hotfix`, original integration branch, incident,
+approval reference and base revision. Existing feature/feat/fix prefixes remain
+supported; emergency start defaults to fix. Never enable hotfix by repository
+name/type, leave it as a default, or change the persistent branching strategy.
+
+These references record the operator's explicit authorization; they do not
+independently prove human approval or replace protected-main controls. Review the
+actual incident/approval evidence, require the applicable CI and protected-main
+approval, and integrate only through a PR. No command permits direct main pushes,
+merges, bypass grants, publication or deployment. Pi requires an explicit Story
+and the same references, validates the preview before apply, and retains the
+claim if any check fails. Resume with the same owner, worktree and references.
+
+Use the same incident/approval selectors for `wood story evidence` and
+`wood delivery status`. Generated evidence verifies the actual merged main PR
+and revision-bound validation CI and records the references. Story completion
+still does not confer release or deployment authority.
+
+After the hotfix integrates, reconcile main back into development through a
+reviewed, validated PR. Record its PR, revision and incident association. Run
+`wood repo release-readiness --json` and retain the exact main/integration SHAs
+and result as reconciliation evidence before any subsequent release integration.
+An unresolved main-only hotfix blocks preparation. Do not rewrite claims or
+history, accept a stale record, or mark reconciliation passed from a branch name.
 
 Preserve a pipeline's necessary ordering for artifact identity and safe rollback,
 and document its exact gate sequence. An explicitly approved early deployment
@@ -171,13 +246,13 @@ authorization or an approved narrowly scoped control change.
 
 | Event | Validation | Release publication |
 | --- | --- | --- |
-| Feature PR → release branch | Required | Forbidden |
-| Feature merge → release branch | Required | Forbidden |
+| Feature PR → configured integration/release branch | Required | Forbidden |
+| Feature merge → configured integration/release branch | Required | Forbidden |
 | Release PR → main | Required | Forbidden |
 | Approved release merge → main | Required | Eligible after release gate |
 | Deployment promotion | Required | Separately controlled |
 
-Agents must not invoke publishing workflows on feature branches, release branches
+Agents must not invoke publishing workflows on feature branches, development/integration or release branches
 or PR events. Semantic-release publishes from `main` only unless a repository
 has an explicitly approved exception. Branch names alone are not a safeguard:
 inspect caller triggers, reusable job conditions, credentials and downstream jobs.
@@ -194,6 +269,6 @@ recovery handoff. Release the claim only after execution stops. Delete completed
 feature branches only after verifying their merge into the designated target,
 clean state, no remaining dependency/recovery need and safe removal. Squash/rebase
 merges need verified PR and content evidence before any force deletion.
-Delete release branches only after the approved merge into `main`, retained
+Retain a long-lived development branch across releases. Delete bounded release branches only after the approved merge into `main`, retained
 release/recovery evidence and confirmation they are no longer needed. Do not
 delete a dirty worktree, a running execution's branch or another owner's claim.
