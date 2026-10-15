@@ -1,4 +1,32 @@
-[tool.wood.architecture]
-domain = "engineering"
-capability = "agent-configuration"
-kind = "configuration"
+["tool"]
+
+["tool"."wood"]
+
+["tool"."wood"."architecture"]
+"domain" = "engineering"
+"capability" = "agent-configuration"
+"kind" = "configuration"
+
+["tool"."wood"."openproject"]
+"project_id" = 3
+"initiative_id" = 552
+
+["tool"."wood"."branching"]
+"strategy" = "integration"
+"release_id" = 26
+"integration_branch" = "development"
+"scope_reference" = "https://projects.woodhost.cloud/work_packages/558; user approved Wave 1 migration on 2026-10-15; initialize development at ed2e81ffc099e17c5411672a376723ee67398e58; no live protection or main publication authorized."
+
+["tool"."semantic_release"]
+"allow_zero_version" = true
+"major_on_zero" = false
+"tag_format" = "v{version}"
+
+["tool"."semantic_release"."remote"]
+"type" = "github"
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "python-semantic-release==10.6.2"]
+
+[tool.uv.workspace]
+members = []

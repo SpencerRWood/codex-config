@@ -1,3 +1,7 @@
+## Development lifecycle
+
+Use root [tool.wood.branching]: feature branches and Story PRs start from and target development. Development validates without publication/deployment. Main requires a separately approved release PR and pinned release workflow. Emergency hotfixes require incident/approval references and reconciliation into development.
+
 # Shared Codex Guidance
 
 - Follow the canonical [branching and delivery policy](docs/branching-policy.md) from the installed codex-config source path. The universal target for every active repository is working branch → development → protected main → automatic pinned repository release workflow. Read root `[tool.wood.branching]`; use declared integration/development, preserving existing trunk/release behavior and claims until deliberate migration. Repository purpose selects publication outputs, never branching strategy. Do not migrate repositories during unrelated Stories.
