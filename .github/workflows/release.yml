@@ -1,0 +1,33 @@
+{
+  "name": "Release",
+  "on": {
+    "push": {
+      "branches": [
+        "main"
+      ]
+    }
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "release": {
+      "if": "github.event_name == 'push' && github.ref == 'refs/heads/main'",
+      "permissions": {
+        "contents": "write"
+      },
+      "uses": "SpencerRWood/workflows/.github/workflows/release.yml@1b806a4ebce73dcab2f0ecf26ffc47b00fac8ef7",
+      "with": {
+        "workflow_revision": "1b806a4ebce73dcab2f0ecf26ffc47b00fac8ef7"
+      },
+      "secrets": {
+        "dbt_host": "${{ secrets.DBT_HOST }}",
+        "dbt_user": "${{ secrets.DBT_USER }}",
+        "dbt_password": "${{ secrets.DBT_PASSWORD }}",
+        "dbt_port": "${{ secrets.DBT_PORT }}",
+        "dbt_dbname": "${{ secrets.DBT_DBNAME }}",
+        "dbt_schema": "${{ secrets.DBT_SCHEMA }}"
+      }
+    }
+  }
+}
